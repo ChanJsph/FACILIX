@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - FACILIX</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            padding: 40px 20px;
+        }
+
+        .register-form {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .register-form h2 {
+            color: #0f2a47;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #0f2a47;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffc107;
+            box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+        }
+
+        .register-btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #0f2a47;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .register-btn-submit:hover {
+            background: #0f2a47;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #0f2a47;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .back-link a:hover {
+            color: #ffc107;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">⊕</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            <div class="auth-buttons">
+                <a href="register.html" class="register-btn">Register</a>
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Register Form -->
+    <div class="register-container">
+        <form class="register-form">
+            <h2>Create Account</h2>
+
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" placeholder="John Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="john@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password" required>
+            </div>
+
+            <button type="submit" class="register-btn-submit">Register</button>
+
+            <div class="back-link">
+                <p>Already have an account? <a href="login.html">Login here</a></p>
+                <p><a href="index.html">← Back to Home</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Handle registration form submission
+        document.querySelector('.register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form values
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                alert('❌ Passwords do not match!');
+                return;
+            }
+
+            // Validate password length
+            if (password.length < 6) {
+                alert('❌ Password must be at least 6 characters long!');
+                return;
+            }
+
+            // Check if user already exists
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.some(user => user.email === email)) {
+                alert('❌ This email is already registered!');
+                return;
+            }
+
+            // Create new user object
+            const newUser = {
+                id: Date.now(),
+                fullname: fullname,
+                email: email,
+                phone: phone,
+                password: password,
+                registeredDate: new Date().toLocaleString()
+            };
+
+            // Save user to localStorage
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Save login session to localStorage (auto-login after registration)
+            const loginSession = {
+                userId: newUser.id,
+                email: newUser.email,
+                fullname: newUser.fullname,
+                loginTime: new Date().toLocaleString(),
+                rememberMe: true
+            };
+
+            localStorage.setItem('currentUser', JSON.stringify(loginSession));
+
+            // Show success message
+            alert('✅ Registration successful! Welcome to FACILIX!');
+
+            // Redirect to home (which will show dashboard)
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

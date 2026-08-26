@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - FACILIX</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        // Smart redirect: If user is logged in, show user services dashboard
+        window.addEventListener('load', () => {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                window.location.href = 'services-dashboard.html';
+            }
+        });
+    </script>
+    <style>
+        .services-hero {
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a5c 100%);
+            padding: 80px 60px;
+            color: white;
+            text-align: center;
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .services-hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .services-hero p {
+            font-size: 18px;
+            max-width: 600px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 80px 60px;
+            background: #f5f7fa;
+        }
+
+        .service-card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .service-card h3 {
+            color: #0f2a47;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .service-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .service-card a {
+            color: #0f2a47;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+            display: inline-block;
+        }
+
+        .service-card a:hover {
+            color: #ffc107;
+        }
+
+        .features-list {
+            background: white;
+            padding: 80px 60px;
+        }
+
+        .features-list h2 {
+            color: #0f2a47;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .features-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 20px;
+        }
+
+        .feature-number {
+            background: #ffc107;
+            color: #0f2a47;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .feature-text h4 {
+            color: #0f2a47;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .feature-text p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a5c 100%);
+            color: white;
+            padding: 80px 60px;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: #ffc107;
+            color: #0f2a47;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+                padding: 40px 30px;
+            }
+
+            .features-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .services-hero,
+            .features-list,
+            .cta-section {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">⊕</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link active">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            <div class="auth-buttons">
+                <a href="register.html" class="register-btn">Register</a>
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Services Hero Section -->
+    <section class="services-hero">
+        <h1>Our Services</h1>
+        <p>Comprehensive facility management and maintenance solutions powered by artificial intelligence to optimize your operations.</p>
+    </section>
+
+    <!-- Services Cards -->
+    <section class="services-grid">
+        <div class="service-card">
+            <div class="service-icon">🔧</div>
+            <h3>Maintenance Management</h3>
+            <p>Streamlined maintenance scheduling, tracking, and execution with real-time monitoring and automated alerts for optimal facility performance.</p>
+            <a href="#">Learn more →</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">📊</div>
+            <h3>Analytics & Reports</h3>
+            <p>Advanced analytics dashboard providing comprehensive insights into facility performance, resource utilization, and maintenance metrics.</p>
+            <a href="#">Learn more →</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">🤖</div>
+            <h3>AI-Powered Predictions</h3>
+            <p>Machine learning algorithms predict maintenance needs before they become critical, reducing downtime and extending equipment lifespan.</p>
+            <a href="#">Learn more →</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">👥</div>
+            <h3>Staff Management</h3>
+            <p>Efficient team coordination, task assignment, and performance tracking to ensure your facility runs smoothly 24/7.</p>
+            <a href="#">Learn more →</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">🔐</div>
+            <h3>Security & Compliance</h3>
+            <p>Enterprise-grade security with compliance monitoring, audit trails, and data protection to safeguard your facility information.</p>
+            <a href="#">Learn more →</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">💬</div>
+            <h3>24/7 Support</h3>
+            <p>Round-the-clock technical support, consultation, and training to ensure your team maximizes FACILIX capabilities.</p>
+            <a href="#">Learn more →</a>
+        </div>
+    </section>
+
+    <!-- Key Features Section -->
+    <section class="features-list">
+        <h2>Why Choose FACILIX?</h2>
+        <div class="features-content">
+            <div class="feature-item">
+                <div class="feature-number">1</div>
+                <div class="feature-text">
+                    <h4>Intelligent Automation</h4>
+                    <p>Automate routine maintenance tasks and let AI handle predictive scheduling for maximum efficiency.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-number">2</div>
+                <div class="feature-text">
+                    <h4>Real-Time Visibility</h4>
+                    <p>Complete visibility into all facility operations with live dashboards and instant notifications.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-number">3</div>
+                <div class="feature-text">
+                    <h4>Cost Reduction</h4>
+                    <p>Reduce operational costs through predictive maintenance and optimized resource allocation.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-number">4</div>
+                <div class="feature-text">
+                    <h4>Scalable Solution</h4>
+                    <p>From single buildings to multi-campus operations, FACILIX scales to meet your needs.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-number">5</div>
+                <div class="feature-text">
+                    <h4>Easy Integration</h4>
+                    <p>Seamlessly integrate with existing systems and infrastructure for smooth implementation.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-number">6</div>
+                <div class="feature-text">
+                    <h4>Mobile Access</h4>
+                    <p>Manage operations from anywhere with our mobile app for iOS and Android platforms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta-section">
+        <h2>Ready to Transform Your Facility?</h2>
+        <p>Get started with FACILIX today and experience smarter, more efficient facility management.</p>
+        <a href="register.html" class="cta-button">Start Your Free Trial</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-icon">⊕</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <p>Empowering smarter campus operations through technology and innovation.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

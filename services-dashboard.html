@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Dashboard - FACILIX</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .services-dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+
+        .dashboard-header p {
+            margin: 0;
+            color: #ccc;
+        }
+
+        .services-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .service-tab-btn {
+            padding: 15px 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .service-tab-btn.active {
+            color: #ffc107;
+            border-bottom-color: #ffc107;
+        }
+
+        .service-tab-btn:hover {
+            color: #0f2a47;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .available-services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-6px);
+            border-color: #ffc107;
+        }
+
+        .service-card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .service-card h3 {
+            font-size: 20px;
+            color: #0f2a47;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        .service-card-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .service-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+
+        .service-features {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            line-height: 1.8;
+        }
+
+        .btn-request-service {
+            width: 100%;
+            padding: 12px;
+            background: #0f2a47;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-request-service:hover {
+            background: #1a3a57;
+            box-shadow: 0 4px 12px rgba(15, 42, 71, 0.2);
+        }
+
+        .active-services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .active-service-card {
+            background: white;
+            border-left: 4px solid #4CAF50;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .active-service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .active-service-title {
+            font-weight: 700;
+            color: #0f2a47;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            background: #d1e7dd;
+            color: #0a3622;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: #d1e7dd;
+            color: #0a3622;
+        }
+
+        .status-badge.inactive {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .service-info {
+            font-size: 13px;
+            color: #666;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-small:hover {
+            background: #f5f7fa;
+            border-color: #ffc107;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 22px;
+            color: #0f2a47;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 25px;
+        }
+
+        .btn-primary-large {
+            background: #ffc107;
+            color: #0f2a47;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-large:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .service-history {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .service-history h3 {
+            font-size: 22px;
+            color: #0f2a47;
+            margin: 0 0 20px 0;
+            font-weight: 700;
+        }
+
+        .history-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-service-name {
+            font-weight: 600;
+            color: #0f2a47;
+        }
+
+        .history-date {
+            color: #999;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .available-services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .active-services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-tabs {
+                flex-direction: column;
+                border-bottom: none;
+            }
+
+            .service-tab-btn {
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                justify-content: flex-start;
+                padding-left: 0;
+            }
+
+            .service-tab-btn.active {
+                border-left-color: #ffc107;
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 20px;">
+            <div class="logo">
+                <span class="logo-icon">⚙️</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link active">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="requests.html" class="nav-link">Requests</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="services-dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>🔧 My Services</h1>
+            <p>Manage and request facility management services</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="services-tabs">
+            <button class="service-tab-btn active" onclick="switchTab('available')">📋 Available Services</button>
+            <button class="service-tab-btn" onclick="switchTab('active')">✓ Active Services</button>
+            <button class="service-tab-btn" onclick="switchTab('history')">📜 History</button>
+        </div>
+
+        <!-- Tab 1: Available Services -->
+        <div id="available" class="tab-content active">
+            <div class="available-services-grid" id="availableServicesGrid">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Tab 2: Active Services -->
+        <div id="active" class="tab-content">
+            <div class="active-services-grid" id="activeServicesGrid">
+                <!-- Active services will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Tab 3: History -->
+        <div id="history" class="tab-content">
+            <div class="service-history">
+                <h3>Service Request History</h3>
+                <div id="historyList">
+                    <!-- History will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const user = getCurrentUser();
+            if (!user) {
+                alert('❌ Please login to access this page');
+                window.location.href = 'services.html';
+                return;
+            }
+            loadServices();
+        });
+
+        // Mock available services
+        const availableServices = [
+            {
+                id: 1,
+                name: 'HVAC Maintenance',
+                icon: '❄️',
+                description: 'Regular maintenance and servicing of heating, ventilation, and air conditioning systems',
+                price: 'Contact for Quote',
+                features: '• Quarterly inspections\n• Filter replacement\n• Emergency support'
+            },
+            {
+                id: 2,
+                name: 'Plumbing Services',
+                icon: '🚿',
+                description: 'Professional plumbing repairs and maintenance for your facility',
+                price: 'Contact for Quote',
+                features: '• 24/7 emergency\n• Leak detection\n• Pipe maintenance'
+            },
+            {
+                id: 3,
+                name: 'Electrical Maintenance',
+                icon: '⚡',
+                description: 'Comprehensive electrical system inspection and maintenance',
+                price: 'Contact for Quote',
+                features: '• Safety inspections\n• Preventive maintenance\n• Emergency repairs'
+            },
+            {
+                id: 4,
+                name: 'Cleaning Services',
+                icon: '🧹',
+                description: 'Professional commercial cleaning for your facility',
+                price: 'Contact for Quote',
+                features: '• Daily cleaning\n• Deep cleaning\n• Specialized services'
+            },
+            {
+                id: 5,
+                name: 'Security Systems',
+                icon: '🔒',
+                description: 'Advanced security monitoring and access control systems',
+                price: 'Contact for Quote',
+                features: '• 24/7 monitoring\n• CCTV systems\n• Access control'
+            },
+            {
+                id: 6,
+                name: 'Pest Control',
+                icon: '🛡️',
+                description: 'Integrated pest management and prevention services',
+                price: 'Contact for Quote',
+                features: '• Regular inspection\n• Treatment plans\n• Prevention programs'
+            }
+        ];
+
+        // Mock active services
+        const activeServices = [
+            {
+                id: 101,
+                name: 'HVAC Maintenance',
+                status: 'active',
+                startDate: '2026-08-01',
+                nextService: '2026-09-01',
+                frequency: 'Monthly'
+            },
+            {
+                id: 102,
+                name: 'Cleaning Services',
+                status: 'active',
+                startDate: '2026-06-15',
+                nextService: '2026-08-20',
+                frequency: 'Weekly'
+            }
+        ];
+
+        // Mock history
+        const serviceHistory = [
+            { service: 'HVAC Maintenance', date: '2026-08-10', status: 'Completed' },
+            { service: 'Plumbing Services', date: '2026-08-05', status: 'Completed' },
+            { service: 'Cleaning Services', date: '2026-08-03', status: 'Completed' },
+            { service: 'Electrical Maintenance', date: '2026-07-28', status: 'Completed' },
+            { service: 'Security Systems', date: '2026-07-15', status: 'Completed' }
+        ];
+
+        // Load services
+        function loadServices() {
+            loadAvailableServices();
+            loadActiveServices();
+            loadHistory();
+        }
+
+        // Load available services
+        function loadAvailableServices() {
+            const grid = document.getElementById('availableServicesGrid');
+            grid.innerHTML = availableServices.map(service => `
+                <div class="service-card">
+                    <div class="service-card-icon">${service.icon}</div>
+                    <h3>${service.name}</h3>
+                    <p class="service-card-description">${service.description}</p>
+                    <div class="service-price">${service.price}</div>
+                    <div class="service-features">${service.features.split('\n').join('<br>')}</div>
+                    <button class="btn-request-service" onclick="requestService(${service.id}, '${service.name}')">
+                        Request Service
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Load active services
+        function loadActiveServices() {
+            const grid = document.getElementById('activeServicesGrid');
+            if (activeServices.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1;">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>No Active Services</h3>
+                            <p>You don't have any active services yet. Request one from the available services!</p>
+                            <button class="btn-primary-large" onclick="switchTab('available')">View Services</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = activeServices.map(service => `
+                    <div class="active-service-card">
+                        <div class="active-service-header">
+                            <div class="active-service-title">${service.name}</div>
+                            <span class="status-badge active">Active</span>
+                        </div>
+                        <div class="service-info">
+                            <span>📅 Started:</span>
+                            <span>${service.startDate}</span>
+                        </div>
+                        <div class="service-info">
+                            <span>⏰ Next Service:</span>
+                            <span>${service.nextService}</span>
+                        </div>
+                        <div class="service-info">
+                            <span>🔄 Frequency:</span>
+                            <span>${service.frequency}</span>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn-small" onclick="pauseService(${service.id})">Pause</button>
+                            <button class="btn-small" onclick="contactSupport(${service.id})">Contact Support</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Load history
+        function loadHistory() {
+            const list = document.getElementById('historyList');
+            if (serviceHistory.length === 0) {
+                list.innerHTML = '<p style="color: #999; text-align: center;">No service history yet.</p>';
+            } else {
+                list.innerHTML = serviceHistory.map(item => `
+                    <div class="history-item">
+                        <div>
+                            <div class="history-service-name">${item.service}</div>
+                            <div class="history-date">${item.date}</div>
+                        </div>
+                        <span style="color: #4CAF50; font-weight: 600;">${item.status}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.service-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Request service
+        function requestService(serviceId, serviceName) {
+            alert(`📋 Request submitted for: ${serviceName}\n\nA team member will contact you shortly to confirm the service details.`);
+        }
+
+        // Pause service
+        function pauseService(serviceId) {
+            alert('⏸️ Service paused. You can resume it anytime from your dashboard.');
+        }
+
+        // Contact support
+        function contactSupport(serviceId) {
+            alert('📞 Support form coming soon!\n\nEmail: support@facilix.com\nPhone: 1-800-FACILIX');
+        }
+    </script>
+</body>
+</html>

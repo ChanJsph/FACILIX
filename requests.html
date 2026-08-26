@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Requests - FACILIX</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .requests-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info h2 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #0f2a47;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #0f2a47;
+        }
+
+        .filter-btn.active {
+            background: #ffc107;
+            border-color: #ffc107;
+            color: #0f2a47;
+        }
+
+        .filter-btn:hover {
+            border-color: #ffc107;
+            background: #fffbf0;
+        }
+
+        .requests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .request-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .request-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-6px);
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .request-id {
+            font-size: 14px;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .request-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-in-progress {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-completed {
+            background: #d1e7dd;
+            color: #0a3622;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .request-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f2a47;
+            margin-bottom: 10px;
+        }
+
+        .request-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .request-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #999;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            margin: 15px 0;
+        }
+
+        .request-meta span {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .request-meta strong {
+            color: #0f2a47;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-view {
+            flex: 1;
+            padding: 10px;
+            background: #0f2a47;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background: #1a3a57;
+            box-shadow: 0 4px 12px rgba(15, 42, 71, 0.2);
+        }
+
+        .btn-edit {
+            flex: 1;
+            padding: 10px;
+            background: #ffc107;
+            color: #0f2a47;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            background: #ffb300;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #0f2a47;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+            font-size: 16px;
+        }
+
+        .create-request-btn {
+            background: #ffc107;
+            color: #0f2a47;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .create-request-btn:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .requests-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .logout-btn {
+                width: 100%;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 20px;">
+            <div class="logo">
+                <span class="logo-icon">⚙️</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="requests.html" class="nav-link active">My Requests</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="requests-container">
+        <!-- User Header -->
+        <div class="user-header" id="userHeader">
+            <div class="user-info">
+                <h2>Welcome, <span id="userName">User</span>! 👋</h2>
+                <p>Email: <span id="userEmail">user@example.com</span></p>
+                <p>Login Time: <span id="loginTime">N/A</span></p>
+            </div>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+
+        <!-- Section Title -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1 class="section-title">My Requests</h1>
+            <button class="create-request-btn" onclick="createNewRequest()">+ New Request</button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterRequests('all')">All</button>
+            <button class="filter-btn" onclick="filterRequests('pending')">Pending</button>
+            <button class="filter-btn" onclick="filterRequests('in-progress')">In Progress</button>
+            <button class="filter-btn" onclick="filterRequests('completed')">Completed</button>
+        </div>
+
+        <!-- Requests Grid -->
+        <div class="requests-grid" id="requestsGrid">
+            <!-- Requests will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">📋</div>
+            <h3>No Requests Found</h3>
+            <p>You haven't created any requests yet. Start by creating a new request below.</p>
+            <button class="create-request-btn" onclick="createNewRequest()">+ Create Your First Request</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in
+        function checkUserLogin() {
+            const user = getCurrentUser();
+            if (!user) {
+                alert('❌ Please login to access this page');
+                window.location.href = 'login.html';
+                return false;
+            }
+            return user;
+        }
+
+        // Load user info on page load
+        window.addEventListener('load', () => {
+            const user = checkUserLogin();
+            if (user) {
+                document.getElementById('userName').textContent = user.fullname || 'User';
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('loginTime').textContent = user.loginTime;
+                
+                loadRequests();
+            }
+        });
+
+        // Mock requests data (in production, this would come from a backend)
+        const mockRequests = [
+            {
+                id: 'REQ-001',
+                title: 'HVAC System Maintenance',
+                description: 'Regular maintenance and filter replacement for the main HVAC system',
+                status: 'in-progress',
+                type: 'Maintenance',
+                priority: 'High',
+                createdDate: '2026-08-15',
+                dueDate: '2026-08-20',
+                assignedTo: 'John Smith'
+            },
+            {
+                id: 'REQ-002',
+                title: 'Conference Room Lighting Issue',
+                description: 'Lights in Conference Room B are flickering and need inspection',
+                status: 'pending',
+                type: 'Repair',
+                priority: 'Medium',
+                createdDate: '2026-08-17',
+                dueDate: '2026-08-22',
+                assignedTo: 'Pending Assignment'
+            },
+            {
+                id: 'REQ-003',
+                title: 'Carpet Cleaning - Floor 3',
+                description: 'Deep carpet cleaning for entire 3rd floor',
+                status: 'completed',
+                type: 'Cleaning',
+                priority: 'Low',
+                createdDate: '2026-08-10',
+                dueDate: '2026-08-16',
+                assignedTo: 'Maria Garcia'
+            },
+            {
+                id: 'REQ-004',
+                title: 'Security System Update',
+                description: 'Software update for security system and camera installation check',
+                status: 'pending',
+                type: 'Installation',
+                priority: 'High',
+                createdDate: '2026-08-16',
+                dueDate: '2026-08-25',
+                assignedTo: 'Pending Assignment'
+            },
+            {
+                id: 'REQ-005',
+                title: 'Plumbing Inspection',
+                description: 'Routine plumbing inspection and maintenance for all bathrooms',
+                status: 'in-progress',
+                type: 'Maintenance',
+                priority: 'Medium',
+                createdDate: '2026-08-12',
+                dueDate: '2026-08-19',
+                assignedTo: 'Robert Johnson'
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        // Load requests
+        function loadRequests() {
+            // In production, fetch from backend API
+            const requests = mockRequests;
+            renderRequests(requests);
+        }
+
+        // Filter requests
+        function filterRequests(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter and render
+            let filtered = mockRequests;
+            if (filter !== 'all') {
+                filtered = mockRequests.filter(req => req.status === filter);
+            }
+            
+            renderRequests(filtered);
+        }
+
+        // Render requests to the grid
+        function renderRequests(requests) {
+            const grid = document.getElementById('requestsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (requests.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            grid.innerHTML = '';
+            
+            requests.forEach(request => {
+                const statusClass = `status-${request.status.replace(' ', '-')}`;
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.innerHTML = `
+                    <div class="request-header">
+                        <span class="request-id">${request.id}</span>
+                        <span class="request-status ${statusClass}">${request.status.replace('-', ' ')}</span>
+                    </div>
+                    <h3 class="request-title">${request.title}</h3>
+                    <p class="request-description">${request.description}</p>
+                    <div class="request-meta">
+                        <span>
+                            <strong>Type</strong>
+                            ${request.type}
+                        </span>
+                        <span>
+                            <strong>Priority</strong>
+                            ${request.priority}
+                        </span>
+                        <span>
+                            <strong>Assigned</strong>
+                            ${request.assignedTo}
+                        </span>
+                    </div>
+                    <div class="request-meta">
+                        <span>
+                            <strong>Created</strong>
+                            ${request.createdDate}
+                        </span>
+                        <span>
+                            <strong>Due Date</strong>
+                            ${request.dueDate}
+                        </span>
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn-view" onclick="viewRequest('${request.id}')">View Details</button>
+                        <button class="btn-edit" onclick="editRequest('${request.id}')">Edit</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // View request details
+        function viewRequest(requestId) {
+            const request = mockRequests.find(r => r.id === requestId);
+            if (request) {
+                alert(`📋 Request Details\n\nID: ${request.id}\nTitle: ${request.title}\nStatus: ${request.status}\nAssigned to: ${request.assignedTo}\nDue: ${request.dueDate}`);
+            }
+        }
+
+        // Edit request
+        function editRequest(requestId) {
+            alert(`✏️ Edit feature for ${requestId} coming soon!`);
+        }
+
+        // Create new request
+        function createNewRequest() {
+            alert('📝 Create Request dialog coming soon!\n\nYou will be able to submit a new facility request here.');
+        }
+    </script>
+</body>
+</html>

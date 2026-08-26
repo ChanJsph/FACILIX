@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - FACILIX</title>
+    <link rel="stylesheet" href="./css/tyles.css">
+    <style>
+        .home-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
+            color: white;
+            padding: 50px 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-text h1 {
+            font-size: 36px;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+
+        .welcome-text p {
+            font-size: 16px;
+            color: #ccc;
+            margin: 10px 0;
+        }
+
+        .welcome-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-primary-home {
+            background: #ffc107;
+            color: #0f2a47;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-home:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-secondary-home {
+            background: transparent;
+            color: #ffc107;
+            border: 2px solid #ffc107;
+            padding: 10px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-home:hover {
+            background: #ffc107;
+            color: #0f2a47;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-left: 4px solid #ffc107;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffc107;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .quick-access {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .quick-access h2 {
+            font-size: 22px;
+            color: #0f2a47;
+            margin: 0 0 25px 0;
+            font-weight: 700;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .quick-link {
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .quick-link:hover {
+            background: #fffbf0;
+            border-color: #ffc107;
+            transform: translateY(-2px);
+        }
+
+        .quick-link-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .quick-link-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f2a47;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-card h3 {
+            font-size: 16px;
+            color: #0f2a47;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .logout-section {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn-logout-sidebar {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #ff5252;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+        }
+
+        .recent-requests {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .recent-requests h2 {
+            font-size: 22px;
+            color: #0f2a47;
+            margin: 0 0 20px 0;
+            font-weight: 700;
+        }
+
+        .request-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-item-title {
+            font-weight: 600;
+            color: #0f2a47;
+            font-size: 14px;
+        }
+
+        .request-item-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-in-progress {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-completed {
+            background: #d1e7dd;
+            color: #0a3622;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .welcome-text h1 {
+                font-size: 28px;
+            }
+
+            .welcome-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-card {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 20px;">
+            <div class="logo">
+                <span class="logo-icon">⚙️</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="requests.html" class="nav-link">Requests</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="home-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h1>Welcome Back, <span id="userName">User</span>! 👋</h1>
+                <p>You're logged in as: <strong id="userEmail">user@example.com</strong></p>
+                <p>Last login: <span id="loginTime">Just now</span></p>
+                <div class="welcome-actions">
+                    <button class="btn-primary-home" onclick="navigateTo('requests.html')">View My Requests</button>
+                    <button class="btn-secondary-home" onclick="navigateTo('reports.html')">View Reports</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRequests">0</div>
+                <div class="stat-label">Total Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingRequests">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="inProgressRequests">0</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedRequests">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Quick Access -->
+            <div class="quick-access">
+                <h2>Quick Access</h2>
+                <div class="quick-links">
+                    <div class="quick-link" onclick="navigateTo('requests.html')">
+                        <div class="quick-link-icon">📋</div>
+                        <div class="quick-link-name">My Requests</div>
+                    </div>
+                    <div class="quick-link" onclick="navigateTo('reports.html')">
+                        <div class="quick-link-icon">📊</div>
+                        <div class="quick-link-name">Analytics</div>
+                    </div>
+                    <div class="quick-link" onclick="navigateTo('services.html')">
+                        <div class="quick-link-icon">🔧</div>
+                        <div class="quick-link-name">Services</div>
+                    </div>
+                    <div class="quick-link" onclick="createNewRequest()">
+                        <div class="quick-link-icon">➕</div>
+                        <div class="quick-link-name">New Request</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Recent Activity -->
+                <div class="sidebar-card">
+                    <h3>📌 Recent Activity</h3>
+                    <div class="activity-item">
+                        <div>Request #REQ-001 updated</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <div>New maintenance scheduled</div>
+                        <div class="activity-time">5 hours ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <div>Report generated</div>
+                        <div class="activity-time">Yesterday</div>
+                    </div>
+                </div>
+
+                <!-- Quick Info -->
+                <div class="sidebar-card">
+                    <h3>ℹ️ System Status</h3>
+                    <div class="activity-item">
+                        <strong>Overall Status:</strong>
+                    </div>
+                    <div style="color: #4CAF50; font-weight: 700; margin: 10px 0;">✓ All Systems Operational</div>
+                    <div class="activity-item" style="margin-top: 10px;">
+                        <strong>Last Sync:</strong> Just now
+                    </div>
+                    <div class="logout-section">
+                        <button class="btn-logout-sidebar" onclick="logoutUser()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Requests Section -->
+        <div class="recent-requests">
+            <h2>Recent Requests</h2>
+            <div id="recentRequestsList">
+                <p style="color: #999;">Loading recent requests...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Mock requests data
+        const mockRequests = [
+            { id: 'REQ-001', title: 'HVAC System Maintenance', status: 'in-progress' },
+            { id: 'REQ-002', title: 'Conference Room Lighting', status: 'pending' },
+            { id: 'REQ-003', title: 'Carpet Cleaning - Floor 3', status: 'completed' },
+            { id: 'REQ-004', title: 'Security System Update', status: 'pending' },
+            { id: 'REQ-005', title: 'Plumbing Inspection', status: 'in-progress' }
+        ];
+
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const user = getCurrentUser();
+            if (!user) {
+                alert('❌ Please login to access this page');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Display user info
+            document.getElementById('userName').textContent = user.fullname || 'User';
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('loginTime').textContent = user.loginTime;
+
+            // Load stats
+            loadStats();
+            
+            // Load recent requests
+            loadRecentRequests();
+        });
+
+        // Load statistics
+        function loadStats() {
+            const total = mockRequests.length;
+            const pending = mockRequests.filter(r => r.status === 'pending').length;
+            const inProgress = mockRequests.filter(r => r.status === 'in-progress').length;
+            const completed = mockRequests.filter(r => r.status === 'completed').length;
+
+            document.getElementById('totalRequests').textContent = total;
+            document.getElementById('pendingRequests').textContent = pending;
+            document.getElementById('inProgressRequests').textContent = inProgress;
+            document.getElementById('completedRequests').textContent = completed;
+        }
+
+        // Load recent requests
+        function loadRecentRequests() {
+            const recent = mockRequests.slice(0, 5);
+            const html = recent.map(req => `
+                <div class="request-item">
+                    <div>
+                        <div class="request-item-title">${req.id} - ${req.title}</div>
+                    </div>
+                    <span class="request-item-status status-${req.status.replace(' ', '-')}">${req.status}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('recentRequestsList').innerHTML = html || '<p style="color: #999;">No recent requests</p>';
+        }
+
+        // Navigate function
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        // Create new request
+        function createNewRequest() {
+            alert('📝 Create Request feature coming soon!');
+        }
+    </script>
+</body>
+</html>

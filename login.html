@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FACILIX</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            padding: 40px 20px;
+        }
+
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: #999;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .login-tab.active {
+            color: #0f2a47;
+            border-bottom-color: #ffc107;
+        }
+
+        .login-tab:hover {
+            color: #0f2a47;
+        }
+
+        .login-form h2 {
+            color: #0f2a47;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .login-form p {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #0f2a47;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffc107;
+            box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .remember-forgot a {
+            color: #0f2a47;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .remember-forgot a:hover {
+            color: #ffc107;
+        }
+
+        .login-btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #0f2a47;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn-submit:hover {
+            background: #0f2a47;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #0f2a47;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .signup-link a:hover {
+            color: #ffc107;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back-link a {
+            color: #0f2a47;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .back-link a:hover {
+            color: #ffc107;
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+        }
+
+        .admin-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">⊕</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            <div class="auth-buttons">
+                <a href="register.html" class="register-btn">Register</a>
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Form -->
+    <div class="login-container">
+        <form class="login-form">
+            <!-- Login Tabs -->
+            <div class="login-tabs">
+                <button type="button" class="login-tab active" data-tab="user-login">User Login</button>
+                <button type="button" class="login-tab" data-tab="admin-login">Admin Login</button>
+            </div>
+
+            <!-- User Login Form -->
+            <div id="user-login" class="form-content active">
+                <h2>Welcome Back</h2>
+                <p>Login to your FACILIX account</p>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+
+                <div class="remember-forgot">
+                    <label>
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="login-btn-submit">Login</button>
+
+                <div class="signup-link">
+                    Don't have an account? <a href="register.html">Sign up here</a>
+                </div>
+            </div>
+
+            <!-- Admin Login Form -->
+            <div id="admin-login" class="form-content">
+                <h2>Admin Portal</h2>
+                <p>Login to FACILIX Administration Panel</p>
+
+                <div class="admin-warning">
+                    ⚠️ This section is restricted to authorized administrators only.
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-email">Admin Email</label>
+                    <input type="email" id="admin-email" name="admin-email" placeholder="admin@facilix.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-password">Admin Password</label>
+                    <input type="password" id="admin-password" name="admin-password" placeholder="Enter admin password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-code">2FA Security Code</label>
+                    <input type="text" id="admin-code" name="admin-code" placeholder="Enter 6-digit code" maxlength="6" required>
+                </div>
+
+                <div class="remember-forgot">
+                    <label>
+                        <input type="checkbox" name="admin-remember"> Remember this device
+                    </label>
+                    <a href="#">Need help?</a>
+                </div>
+
+                <button type="submit" class="login-btn-submit">Admin Login</button>
+            </div>
+
+            <div class="back-link">
+                <a href="index.html">← Back to Home</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.login-tab').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabName = this.getAttribute('data-tab');
+                
+                // Hide all form content
+                document.querySelectorAll('.form-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Remove active class from all tabs
+                document.querySelectorAll('.login-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Show selected form content
+                document.getElementById(tabName).classList.add('active');
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+            });
+        });
+
+        // Handle User Login
+        document.querySelector('.login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get active form (user or admin)
+            const activeForm = document.querySelector('.form-content.active');
+            
+            if (activeForm.id === 'user-login') {
+                handleUserLogin();
+            } else if (activeForm.id === 'admin-login') {
+                handleAdminLogin();
+            }
+        });
+
+        function handleUserLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.querySelector('input[name="remember"]').checked;
+
+            // Validate inputs
+            if (!email || !password) {
+                alert('❌ Please enter email and password');
+                return;
+            }
+
+            // Get users from localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+            // Find user with matching email and password
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                alert('❌ Invalid email or password!');
+                return;
+            }
+
+            // Save login session to localStorage
+            const loginSession = {
+                userId: user.id,
+                email: user.email,
+                fullname: user.fullname,
+                loginTime: new Date().toLocaleString(),
+                rememberMe: rememberMe
+            };
+
+            localStorage.setItem('currentUser', JSON.stringify(loginSession));
+
+            // Show success message
+            alert(`✅ Welcome back, ${user.fullname}!`);
+
+            // Redirect to home (which will show dashboard)
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        function handleAdminLogin() {
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            const code = document.getElementById('admin-code').value;
+            const rememberDevice = document.querySelector('input[name="admin-remember"]').checked;
+
+            // Validate inputs
+            if (!email || !password || !code) {
+                alert('❌ Please fill in all fields');
+                return;
+            }
+
+            // Demo admin credentials (in production, verify with backend)
+            const adminEmail = 'admin@facilix.com';
+            const adminPassword = 'admin123';
+            const validCode = '123456'; // Demo 2FA code
+
+            // Check admin credentials
+            if (email === adminEmail && password === adminPassword && code === validCode) {
+                // Save admin login session
+                const adminSession = {
+                    userId: 'admin_' + Date.now(),
+                    email: email,
+                    role: 'admin',
+                    loginTime: new Date().toLocaleString(),
+                    rememberDevice: rememberDevice
+                };
+
+                localStorage.setItem('currentAdmin', JSON.stringify(adminSession));
+
+                alert('✅ Admin login successful!');
+
+                // Redirect to home (which will show dashboard)
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                alert('❌ Invalid admin credentials or 2FA code!');
+            }
+        }
+    </script>
+</body>
+</html>

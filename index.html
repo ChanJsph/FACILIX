@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FACILIX - Intelligent Facility Management System</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script>
+        // Smart redirect: If user is logged in, go to home dashboard
+        window.addEventListener('load', () => {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                window.location.href = 'home.html';
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">⊕</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            <div class="auth-buttons">
+                <a href="register.html" class="register-btn">Register</a>
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Hero Section -->
+    <main class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <span class="badge">SMART • SECURE • EFFICIENT</span>
+                <h1 class="hero-title">FACILIX</h1>
+                <p class="hero-subtitle">An AI-Driven Intelligent Facility Maintenance and Service Management System</p>
+                <button class="cta-button">View Our Solutions</button>
+            </div>
+            <div class="hero-image">
+                <img src="building.png" alt="Facility Building">
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-card">
+            <h3>Secure</h3>
+            <p>Your data is protected with advanced security.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Efficient</h3>
+            <p>Automated workflows save time and effort.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Reliable</h3>
+            <p>Built for performance and reliability.</p>
+        </div>
+        <div class="feature-card">
+            <h3>User Friendly</h3>
+            <p>Designed for everyone in the campus.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-icon">⊕</span>
+                <span class="logo-text">FACILIX</span>
+            </div>
+            <p>Empowering smarter campus operations through technology and innovation.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
