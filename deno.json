@@ -6,7 +6,7 @@
     "dev:deno": "deno run -A --watch server.ts",
     "dev:all": "deno run -A npm:concurrently \"deno task dev:vite\" \"deno task dev:deno\"",
     "dev:lan": "deno task dev:all",
-    "build": "deno run -A npm:vite build && mkdir -p dist/scripts dist/static dist/css && cp scripts/script.js dist/scripts/ 2>/dev/null; cp static/building.png dist/static/ 2>/dev/null; cp css/styles.css dist/css/ 2>/dev/null; echo '✓ build ready: dist/'",
+    "build": "deno run -A npm:vite build && mkdir -p dist/scripts dist/static dist/css && cp scripts/script.js dist/scripts/ 2>/dev/null; cp scripts/nav.js dist/scripts/ 2>/dev/null; cp static/building.png dist/static/ 2>/dev/null; cp css/styles.css dist/css/ 2>/dev/null; echo '✓ build ready: dist/'",
     "preview": "deno run -A npm:vite preview --host 0.0.0.0 --port 4173",
     "serve": "deno run -A --watch server.ts",
     "serve:prod": "deno task build && deno run -A server.ts",

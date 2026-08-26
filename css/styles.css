@@ -284,7 +284,193 @@ body {
     line-height: 1.6;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSIVE NAVIGATION (SITE-WIDE) ===== */
+.logo {
+    text-decoration: none;
+}
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-toggle:hover {
+    border-color: #ffc107;
+    background: rgba(255,193,7,0.08);
+}
+
+.nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    transform-origin: center;
+}
+
+.nav-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.nav-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-left: auto;
+}
+
+.nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: 72px;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-overlay.active {
+    opacity: 1;
+}
+
+/* Ensure header above overlay */
+.header {
+    min-height: 72px;
+}
+
+/* Desktop — keep horizontal */
+@media (min-width: 901px) {
+    .nav-menu {
+        flex-direction: row;
+    }
+}
+
+/* Tablet + Mobile — collapse */
+@media (max-width: 900px) {
+    .nav-toggle {
+        display: flex;
+        margin-left: auto;
+    }
+
+    .header-container {
+        padding: 0 20px;
+        gap: 16px;
+    }
+
+    /* support legacy inline .container headers */
+    .header > .container {
+        padding: 0 20px !important;
+        gap: 16px;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .nav-menu {
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background: #0f2a47;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 12px 20px 24px;
+        border-top: 1px solid #1f3a5a;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+        transform: translateY(-8px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
+        z-index: 95;
+        max-height: calc(100vh - 72px);
+        overflow-y: auto;
+    }
+
+    .nav-menu.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .nav-overlay.active {
+        display: block;
+    }
+
+    .navbar {
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+        padding: 8px 0;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 14px 12px;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-link::after {
+        display: none;
+    }
+
+    .nav-link:hover {
+        background: rgba(255,193,7,0.12);
+        transform: none;
+        color: #ffc107;
+    }
+
+    .nav-link.active {
+        background: rgba(255,193,7,0.18);
+        color: #ffc107;
+    }
+
+    .auth-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        padding-top: 16px;
+        margin-top: 12px;
+        border-top: 1px solid #1f3a5a;
+    }
+
+    .register-btn,
+    .login-btn {
+        width: 100%;
+        text-align: center;
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+}
+
 @media (max-width: 768px) {
     .hero-container {
         grid-template-columns: 1fr;
@@ -295,21 +481,25 @@ body {
         font-size: 48px;
     }
 
-    .navbar {
-        gap: 20px;
-    }
-
     .features {
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
         padding: 40px 30px;
     }
 
-    .header-container {
-        padding: 0 30px;
-    }
-
     .hero-section {
         padding: 40px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-container {
+        padding: 0 16px;
+    }
+    .logo {
+        font-size: 20px;
+    }
+    .logo-icon {
+        font-size: 24px;
     }
 }

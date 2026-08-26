@@ -294,18 +294,22 @@
 <body>
     <!-- Header -->
     <header class="header">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 20px;">
-            <div class="logo">
+        <div class="header-container">
+            <a href="index.html" class="logo">
                 <span class="logo-icon">⚙️</span>
                 <span class="logo-text">FACILIX</span>
-            </div>
+            </a>
             <nav class="navbar">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="services.html" class="nav-link">Services</a>
                 <a href="reports.html" class="nav-link">Reports</a>
-                <a href="requests.html" class="nav-link active">My Requests</a>
+                <a href="requests.html" class="nav-link active">Requests</a>
                 <a href="about.html" class="nav-link">About</a>
             </nav>
+            <div class="auth-buttons">
+                <a href="register.html" class="register-btn">Register</a>
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
         </div>
     </header>
 
@@ -350,6 +354,7 @@
     </div>
 
     <script src="scripts/script.js"></script>
+    <script src="scripts/nav.js"></script>
     <script>
         // Check if user is logged in
         function checkUserLogin() {
