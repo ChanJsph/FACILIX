@@ -1,6 +1,8 @@
 node_modules/
 dist/
 .deno/
+data/
+*.db
 .env
 .DS_Store
 *.log

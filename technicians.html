@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technicians — FACILIX Admin</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <style>
+        .admin-container { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+        .admin-header {
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
+            color: white;
+            padding: 22px 24px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        .admin-header h1 { margin:0; font-size:22px; font-weight:800; }
+        .admin-header p { margin:6px 0 0; color:#cbd5e1; font-size:12px; }
+        .admin-grid { display:grid; grid-template-columns: 380px 1fr; gap:18px; }
+        .card { background:white; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border:1px solid #eef2f7; }
+        .card h3 { margin:0 0 12px; color:#0f2a47; font-size:16px; font-weight:800; }
+        .card-body { padding:18px; }
+        .form-group { margin-bottom:12px; }
+        .form-group label { display:block; font-weight:700; color:#0f2a47; font-size:12px; margin-bottom:6px; }
+        .form-group input, .form-group select {
+            width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px;
+        }
+        .form-group input:focus, .form-group select:focus { outline:none; border-color:#ffc107; box-shadow:0 0 0 3px rgba(255,193,7,0.15); }
+        .btn-primary {
+            width:100%; background:#0f2a47; color:white; border:none; padding:11px; border-radius:6px; font-weight:700; cursor:pointer;
+        }
+        .btn-primary:hover { background:#1a3a57; }
+        .btn-ghost { background:white; border:1px solid #ddd; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:600; }
+        .tech-list { display:flex; flex-direction:column; gap:10px; max-height: 60vh; overflow:auto; }
+        .tech-item {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:12px 14px; border:1px solid #eef2f7; border-radius:8px; background:#f8fafc;
+        }
+        .tech-item .meta { display:flex; flex-direction:column; gap:2px; }
+        .tech-item .name { font-weight:700; color:#0f2a47; font-size:14px; }
+        .tech-item .sub { color:#64748b; font-size:12px; }
+        .tech-item .role { font-size:11px; font-weight:700; background:#fff3cd; color:#856404; padding:3px 8px; border-radius:999px; border:1px solid #ffc107; }
+        .empty { text-align:center; padding:30px; color:#64748b; }
+        .hint { font-size:11px; color:#856404; background:#fff3cd; border:1px solid #ffc107; padding:8px; border-radius:6px; margin-top:8px; }
+        .inv-grid { display:grid; grid-template-columns: 340px 1fr; gap:18px; }
+        .badge-low { background:#fee2e2 !important; color:#b91c1c !important; border-color:#fca5a5 !important; }
+        .badge-ok { background:#dcfce7 !important; color:#166534 !important; border-color:#86efac !important; }
+        @media (max-width: 860px) { .admin-grid, .inv-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">⊕</span>
+                <span class="logo-text">FACILIX</span>
+            </a>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="requests.html" class="nav-link">Requests</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            <div class="auth-buttons">
+                <a href="register.html" class="register-btn">Register</a>
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>👷 Technicians — Admin</h1>
+                <p>Only <strong>superadmin</strong> can create technician / admin accounts. Add by name, username, email.</p>
+            </div>
+            <span id="adminRoleBadge" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);padding:8px 12px;border-radius:999px;font-size:12px;"></span>
+        </div>
+
+        <div class="admin-grid">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Add Technician</h3>
+                    <p style="color:#64748b;font-size:12px;margin:0 0 14px;">Creates a technician account (requires superadmin). For quick list, just name is enough — it will be stored locally.</p>
+                    <form id="techForm" novalidate>
+                        <div class="form-group">
+                            <label for="techName">Technician Name *</label>
+                            <input type="text" id="techName" placeholder="e.g. Alex Rivera" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="techUsername">Username <small style="font-weight:normal;color:#64748b">(for login)</small></label>
+                            <input type="text" id="techUsername" placeholder="alex.technician" pattern="[a-zA-Z0-9._-]{3,20}">
+                        </div>
+                        <div class="form-group">
+                            <label for="techEmail">Email *</label>
+                            <input type="email" id="techEmail" placeholder="alex@facilix.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="techPhone">Phone</label>
+                            <input type="tel" id="techPhone" placeholder="+1-222-...">
+                        </div>
+                        <div class="form-group">
+                            <label for="techPassword">Temp Password *</label>
+                            <input type="password" id="techPassword" placeholder="Tech123!" required>
+                            <div class="hint">Default: Tech123! — technician will change on first login. Only superadmin can create.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="techRole">Role</label>
+                            <select id="techRole">
+                                <option value="technician" selected>technician</option>
+                                <option value="admin">admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" id="techSubmitBtn">Add Technician</button>
+                        <button type="button" class="btn-ghost" onclick="addToLocalList()" style="width:100%;margin-top:8px;">+ Add to Local List Only (name)</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;">
+                        <h3 style="margin:0;">Technician List</h3>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn-ghost" onclick="loadTechnicians()">↻ Refresh</button>
+                            <button class="btn-ghost" onclick="exportList()">⤓ Export</button>
+                        </div>
+                    </div>
+                    <div id="techCounter" style="color:#64748b;font-size:12px;margin-bottom:10px;"></div>
+                    <div class="tech-list" id="techList">
+                        <div class="empty">Loading technicians…</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technician Inventory -->
+        <div class="card" style="margin-top:18px;">
+            <div class="card-body">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;">
+                    <h3 style="margin:0;">🧰 Technician Inventory</h3>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-ghost" onclick="loadInventory()">↻ Refresh</button>
+                        <button class="btn-ghost" onclick="resetInventory()">⤺ Defaults</button>
+                    </div>
+                </div>
+                <p style="color:#64748b;font-size:12px;margin:0 0 14px;">Supplies technicians need on site — pipes, bulbs, tools, etc. Items at or below their threshold are flagged <strong style="color:#b91c1c;">low</strong>.</p>
+                <div class="inv-grid">
+                    <div>
+                        <form id="invForm" novalidate>
+                            <div class="form-group">
+                                <label for="invName">Item *</label>
+                                <input type="text" id="invName" placeholder="e.g. PVC Pipe 1/2 inch" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="invCategory">Category</label>
+                                <select id="invCategory">
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Tools">Tools</option>
+                                    <option value="HVAC">HVAC</option>
+                                    <option value="General">General</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="invQty">Quantity *</label>
+                                <input type="number" id="invQty" min="0" placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="invUnit">Unit</label>
+                                <input type="text" id="invUnit" placeholder="pcs, m, box" value="pcs">
+                            </div>
+                            <div class="form-group">
+                                <label for="invMin">Low-stock threshold</label>
+                                <input type="number" id="invMin" min="0" placeholder="reorder below" value="5">
+                            </div>
+                            <button type="submit" class="btn-primary" id="invSubmitBtn">Add Item</button>
+                        </form>
+                    </div>
+                    <div>
+                        <div id="invCounter" style="color:#64748b;font-size:12px;margin-bottom:10px;"></div>
+                        <div class="tech-list" id="invList">
+                            <div class="empty">Loading inventory…</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script>
+        const LOCAL_KEY = 'facilix_technicians_local';
+        const INV_KEY = 'facilix_inventory';
+        const DEFAULT_INV = [
+            { id:'def-pvc', name:'PVC Pipe 1/2"', category:'Plumbing', qty:20, unit:'pcs', min:10 },
+            { id:'def-copper', name:'Copper Pipe 3/4"', category:'Plumbing', qty:8, unit:'pcs', min:10 },
+            { id:'def-bulb', name:'LED Light Bulb 9W', category:'Electrical', qty:50, unit:'pcs', min:15 },
+            { id:'def-fuse', name:'Fuse 13A', category:'Electrical', qty:4, unit:'pcs', min:10 },
+            { id:'def-tape', name:'Electrical Tape', category:'Electrical', qty:30, unit:'rolls', min:10 },
+            { id:'def-wrench', name:'Adjustable Wrench', category:'Tools', qty:12, unit:'pcs', min:5 },
+            { id:'def-filter', name:'HVAC Air Filter', category:'HVAC', qty:6, unit:'pcs', min:8 },
+            { id:'def-screw', name:'Screws Assorted', category:'General', qty:200, unit:'pcs', min:50 }
+        ];
+
+        function getInventory() {
+            try {
+                const raw = localStorage.getItem(INV_KEY);
+                if (!raw) { localStorage.setItem(INV_KEY, JSON.stringify(DEFAULT_INV)); return DEFAULT_INV.slice(); }
+                return JSON.parse(raw);
+            } catch { return DEFAULT_INV.slice(); }
+        }
+        function setInventory(arr) { localStorage.setItem(INV_KEY, JSON.stringify(arr)); }
+        function resetInventory() { setInventory(DEFAULT_INV.slice()); loadInventory(); }
+
+        let editingInvId = null;
+        function loadInventory() {
+            const listEl = document.getElementById('invList');
+            const counter = document.getElementById('invCounter');
+            const items = getInventory().sort((a,b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+            const lowCount = items.filter(i => i.qty <= i.min).length;
+            counter.textContent = `${items.length} item(s) • ${lowCount} low stock`;
+            if (items.length === 0) {
+                listEl.innerHTML = `<div class="empty">No inventory items. Add supplies on the left.</div>`;
+                return;
+            }
+            listEl.innerHTML = items.map(i => {
+                const low = i.qty <= i.min;
+                return `
+                    <div class="tech-item">
+                        <div class="meta">
+                            <span class="name">${i.name}</span>
+                            <span class="sub">${i.category} • ${i.qty} ${i.unit}${low ? ` • ⚠ low stock (≤ ${i.min})` : ` • reorder ≤ ${i.min}`}</span>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <span class="role ${low ? 'badge-low' : 'badge-ok'}">${low ? 'Low' : 'OK'}</span>
+                            <button class="btn-ghost" onclick="editInv('${i.id}')" style="padding:6px 8px;font-size:12px;">Edit</button>
+                            <button class="btn-ghost" onclick="removeInv('${i.id}')" style="padding:6px 8px;font-size:12px;">Remove</button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+        function editInv(id) {
+            const item = getInventory().find(x => x.id === id);
+            if (!item) return;
+            editingInvId = id;
+            document.getElementById('invName').value = item.name;
+            document.getElementById('invCategory').value = item.category;
+            document.getElementById('invQty').value = item.qty;
+            document.getElementById('invUnit').value = item.unit;
+            document.getElementById('invMin').value = item.min;
+            document.getElementById('invSubmitBtn').textContent = 'Update Item';
+            document.getElementById('invName').focus();
+        }
+        function removeInv(id) {
+            if (!confirm('Remove this item from inventory?')) return;
+            setInventory(getInventory().filter(x => x.id !== id));
+            if (editingInvId === id) cancelInvEdit();
+            loadInventory();
+        }
+        function cancelInvEdit() {
+            editingInvId = null;
+            document.getElementById('invForm').reset();
+            document.getElementById('invUnit').value = 'pcs';
+            document.getElementById('invMin').value = 5;
+            document.getElementById('invSubmitBtn').textContent = 'Add Item';
+        }
+        document.getElementById('invForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('invName').value.trim();
+            const category = document.getElementById('invCategory').value;
+            const qty = parseInt(document.getElementById('invQty').value, 10);
+            const unit = document.getElementById('invUnit').value.trim() || 'pcs';
+            const min = parseInt(document.getElementById('invMin').value, 10) || 0;
+            if (!name || isNaN(qty)) { alert('❌ Name and quantity required'); return; }
+            const items = getInventory();
+            if (editingInvId) {
+                const it = items.find(x => x.id === editingInvId);
+                if (it) { it.name = name; it.category = category; it.qty = qty; it.unit = unit; it.min = min; }
+                setInventory(items); cancelInvEdit(); loadInventory();
+                return;
+            }
+            items.push({ id: 'inv-' + Date.now(), name, category, qty, unit, min });
+            setInventory(items); cancelInvEdit(); loadInventory();
+        });
+
+        function getLocalList() {
+            try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]'); } catch { return []; }
+        }
+        function setLocalList(arr) {
+            localStorage.setItem(LOCAL_KEY, JSON.stringify(arr));
+        }
+        function addToLocalList() {
+            const name = document.getElementById('techName').value.trim();
+            if (!name) { alert('❌ Enter technician name'); return; }
+            const list = getLocalList();
+            list.unshift({ id: 'local-' + Date.now(), name, createdAt: new Date().toLocaleString(), source: 'local' });
+            setLocalList(list);
+            document.getElementById('techName').value = '';
+            loadTechnicians();
+            alert('✅ Added to local list: ' + name);
+        }
+        function exportList() {
+            const data = getLocalList();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'technicians.json'; a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function loadTechnicians() {
+            const listEl = document.getElementById('techList');
+            const counter = document.getElementById('techCounter');
+            // Try server (SQLite) first
+            let serverTechs = [];
+            const token = localStorage.getItem('facilix_token');
+            try {
+                const res = await fetch('/api/auth/users', { headers: token ? { 'Authorization': 'Bearer ' + token } : {} });
+                const data = await res.json();
+                if (data.ok && Array.isArray(data.users)) {
+                    serverTechs = data.users.filter(u => u.role === 'technician' || u.role === 'admin');
+                }
+            } catch {}
+
+            const localTechs = getLocalList().map(x => ({ fullname: x.name, username: '-', email: '-', role: 'technician', source: 'local', id: x.id }));
+
+            const all = [...localTechs, ...serverTechs];
+
+            counter.textContent = `${all.length} technician(s) — ${serverTechs.length} from server (SQLite) + ${localTechs.length} local`;
+
+            if (all.length === 0) {
+                listEl.innerHTML = `<div class="empty">No technicians yet. Add via form on the left.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = all.map(u => {
+                const isLocal = u.source === 'local';
+                const name = u.fullname || u.name || '-';
+                const sub = isLocal ? `Local list • ${u.createdAt || ''}` : `${u.username || '-'} • ${u.email}`;
+                return `
+                    <div class="tech-item">
+                        <div class="meta">
+                            <span class="name">${name}</span>
+                            <span class="sub">${sub}</span>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <span class="role">${u.role}</span>
+                            ${isLocal ? `<button class="btn-ghost" onclick="removeLocal('${u.id}')" style="padding:6px 8px;font-size:12px;">Remove</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeLocal(id) {
+            const list = getLocalList().filter(x => x.id !== id);
+            setLocalList(list);
+            loadTechnicians();
+        }
+
+        // Guard: only admin/superadmin can view this page (technician/complainant limited to home/services/about)
+        window.addEventListener('load', async () => {
+            let user = null;
+            try { user = JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch {}
+            try { const me = await window.facilixAuth.fetchMe(); if (me) user = me; } catch {}
+            const badge = document.getElementById('adminRoleBadge');
+            if (badge) badge.textContent = user ? `${user.fullname || user.username || user.email} — ${user.role}` : 'Not logged in';
+            if (!user) { alert('❌ Please login'); window.location.href = 'login.html'; return; }
+            if (user.role !== 'admin' && user.role !== 'superadmin') {
+                alert('⛔ Admin only — technicians list is for admin/superadmin. Your role: ' + user.role);
+                window.location.href = 'index.html';
+                return;
+            }
+            loadTechnicians();
+            loadInventory();
+        });
+
+        // Create technician via SQLite (only superadmin can create technician/admin per auth.ts)
+        document.getElementById('techForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullname = document.getElementById('techName').value.trim();
+            const username = document.getElementById('techUsername').value.trim();
+            const email = document.getElementById('techEmail').value.trim();
+            const phone = document.getElementById('techPhone').value.trim();
+            const password = document.getElementById('techPassword').value;
+            const role = document.getElementById('techRole').value;
+
+            if (!fullname || !email || !password) { alert('❌ Name, email, password required'); return; }
+
+            const btn = document.getElementById('techSubmitBtn');
+            const orig = btn.textContent; btn.textContent = 'Creating...'; btn.disabled = true;
+
+            try {
+                const token = localStorage.getItem('facilix_token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = 'Bearer ' + token;
+                const payload = { fullname, email, password, role };
+                if (username) payload.username = username;
+                if (phone) payload.phone = phone;
+
+                const res = await fetch('/api/auth/register', { method: 'POST', headers, body: JSON.stringify(payload) });
+                const data = await res.json();
+                if (!res.ok || !data.ok) {
+                    alert('❌ ' + (data.error || 'Failed'));
+                    btn.textContent = orig; btn.disabled = false;
+                    return;
+                }
+                // Also add to local list for quick UI
+                const list = getLocalList();
+                list.unshift({ id: data.user.id, name: data.user.fullname, username: data.user.username, email: data.user.email, role: data.user.role, createdAt: new Date().toLocaleString(), source: 'server' });
+                // keep local list in sync but server is source of truth
+                alert(`✅ ${role} created: ${data.user.fullname} (${data.user.email})`);
+                e.target.reset();
+                loadTechnicians();
+            } catch (err) {
+                console.error(err);
+                alert('❌ Network error — is Deno server running?');
+            } finally {
+                btn.textContent = orig; btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

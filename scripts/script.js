@@ -43,14 +43,6 @@ window.addEventListener('load', () => {
 // Ensure body is visible on page load
 document.body.style.opacity = '1';
 
-const button = document.querySelector("button");
-
-if (button) {
-    button.addEventListener("click", function() {
-        alert("Welcome to my website!");
-    });
-}
-
 // ===== USER MANAGEMENT UTILITIES =====
 
 // Check if user is logged in

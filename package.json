@@ -9,7 +9,7 @@
     "dev:lan": "vite --host 0.0.0.0 --port 5173",
     "dev:wan": "vite --host 0.0.0.0 --port 5173 --open",
     "dev:all": "concurrently \"vite --host 0.0.0.0 --port 5173\" \"deno run -A --watch server.ts\"",
-    "build": "vite build && mkdir -p dist/scripts dist/static dist/css && cp scripts/script.js dist/scripts/ 2>/dev/null; cp scripts/nav.js dist/scripts/ 2>/dev/null; cp static/building.png dist/static/ 2>/dev/null; cp css/styles.css dist/css/ 2>/dev/null; echo '✓ build ready: dist/'",
+    "build": "vite build && mkdir -p dist/scripts dist/static dist/css && cp scripts/script.js dist/scripts/ 2>/dev/null; cp scripts/nav.js dist/scripts/ 2>/dev/null; cp scripts/auth.js dist/scripts/ 2>/dev/null; cp static/building.png dist/static/ 2>/dev/null; cp css/styles.css dist/css/ 2>/dev/null; echo '✓ build ready: dist/'",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "preview:lan": "vite preview --host 0.0.0.0 --port 4173",
     "serve": "deno run -A --watch server.ts",

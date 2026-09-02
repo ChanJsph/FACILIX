@@ -212,7 +212,7 @@
 
     <!-- Login Form -->
     <div class="login-container">
-        <form class="login-form">
+        <form class="login-form" novalidate>
             <!-- Login Tabs -->
             <div class="login-tabs">
                 <button type="button" class="login-tab active" data-tab="user-login">User Login</button>
@@ -223,15 +223,16 @@
             <div id="user-login" class="form-content active">
                 <h2>Welcome Back</h2>
                 <p>Login to your FACILIX account</p>
+                <p style="font-size:12px;color:#856404;background:#fff3cd;padding:6px;border-radius:4px;margin:-10px 0 14px;">Demo: complainant@facilix.com / User123! — overlord / admin123 (superadmin)</p>
 
                 <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                    <label for="email">Email or Username</label>
+                    <input type="text" id="email" name="email" placeholder="your@email.com or username" required autocomplete="username">
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
 
                 <div class="remember-forgot">
@@ -258,13 +259,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="admin-email">Admin Email</label>
-                    <input type="email" id="admin-email" name="admin-email" placeholder="admin@facilix.com" required>
+                    <label for="admin-email">Admin Email or Username</label>
+                    <input type="text" id="admin-email" name="admin-email" placeholder="admin@facilix.com or overlord" required autocomplete="username">
                 </div>
 
                 <div class="form-group">
                     <label for="admin-password">Admin Password</label>
-                    <input type="password" id="admin-password" name="admin-password" placeholder="Enter admin password" required>
+                    <input type="password" id="admin-password" name="admin-password" placeholder="Enter admin password" required autocomplete="current-password">
                 </div>
 
                 <div class="form-group">
@@ -287,128 +288,96 @@
             </div>
         </form>
     </div>
-
     <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
     <script src="scripts/nav.js"></script>
     <script>
-        // Tab switching functionality
+        // Fix invalid form controls: hidden required inputs block submit (display:none + required)
+        // We keep form novalidate and toggle disabled on hidden tab's inputs.
+        function syncLoginTabs() {
+            document.querySelectorAll('.form-content').forEach(c => {
+                const isActive = c.classList.contains('active');
+                c.querySelectorAll('input, select, textarea, button').forEach(inp => {
+                    inp.disabled = !isActive;
+                    inp.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+                });
+            });
+        }
+
+        // Tab switching
         document.querySelectorAll('.login-tab').forEach(tab => {
             tab.addEventListener('click', function(e) {
                 e.preventDefault();
                 const tabName = this.getAttribute('data-tab');
-                
-                // Hide all form content
-                document.querySelectorAll('.form-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // Remove active class from all tabs
-                document.querySelectorAll('.login-tab').forEach(t => {
-                    t.classList.remove('active');
-                });
-                
-                // Show selected form content
+                document.querySelectorAll('.form-content').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
                 document.getElementById(tabName).classList.add('active');
-                
-                // Add active class to clicked tab
                 this.classList.add('active');
+                syncLoginTabs();
             });
         });
 
-        // Handle User Login
+        // Initial: disable hidden admin tab inputs so HTML5 validation ignores them
+        syncLoginTabs();
+
         document.querySelector('.login-form').addEventListener('submit', function(e) {
             e.preventDefault();
-
-            // Get active form (user or admin)
             const activeForm = document.querySelector('.form-content.active');
-            
-            if (activeForm.id === 'user-login') {
-                handleUserLogin();
-            } else if (activeForm.id === 'admin-login') {
-                handleAdminLogin();
-            }
+            if (activeForm.id === 'user-login') handleUserLogin();
+            else if (activeForm.id === 'admin-login') handleAdminLogin();
         });
 
-        function handleUserLogin() {
+        async function handleUserLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const rememberMe = document.querySelector('input[name="remember"]').checked;
-
-            // Validate inputs
-            if (!email || !password) {
-                alert('❌ Please enter email and password');
-                return;
+            if (!email || !password) { alert('❌ Please enter email and password'); return; }
+            const btn = document.querySelector('#user-login .login-btn-submit');
+            const orig = btn.textContent; btn.textContent = 'Logging in...'; btn.disabled = true;
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.ok) { alert('❌ ' + (data.error || 'Login failed')); btn.textContent = orig; btn.disabled = false; return; }
+                window.facilixAuth.setSession(data.token, data.user);
+                alert(`✅ Welcome ${data.user.fullname} (${data.user.role})`);
+                setTimeout(() => { window.location.href = 'index.html'; }, 600);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Network error — is Deno server running?');
+                btn.textContent = orig; btn.disabled = false;
             }
-
-            // Get users from localStorage
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-
-            // Find user with matching email and password
-            const user = users.find(u => u.email === email && u.password === password);
-
-            if (!user) {
-                alert('❌ Invalid email or password!');
-                return;
-            }
-
-            // Save login session to localStorage
-            const loginSession = {
-                userId: user.id,
-                email: user.email,
-                fullname: user.fullname,
-                loginTime: new Date().toLocaleString(),
-                rememberMe: rememberMe
-            };
-
-            localStorage.setItem('currentUser', JSON.stringify(loginSession));
-
-            // Show success message
-            alert(`✅ Welcome back, ${user.fullname}!`);
-
-            // Redirect to home (which will show dashboard)
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
         }
 
-        function handleAdminLogin() {
+        async function handleAdminLogin() {
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-password').value;
-            const code = document.getElementById('admin-code').value;
-            const rememberDevice = document.querySelector('input[name="admin-remember"]').checked;
-
-            // Validate inputs
-            if (!email || !password || !code) {
-                alert('❌ Please fill in all fields');
-                return;
-            }
-
-            // Demo admin credentials (in production, verify with backend)
-            const adminEmail = 'admin@facilix.com';
-            const adminPassword = 'admin123';
-            const validCode = '123456'; // Demo 2FA code
-
-            // Check admin credentials
-            if (email === adminEmail && password === adminPassword && code === validCode) {
-                // Save admin login session
-                const adminSession = {
-                    userId: 'admin_' + Date.now(),
-                    email: email,
-                    role: 'admin',
-                    loginTime: new Date().toLocaleString(),
-                    rememberDevice: rememberDevice
-                };
-
-                localStorage.setItem('currentAdmin', JSON.stringify(adminSession));
-
-                alert('✅ Admin login successful!');
-
-                // Redirect to home (which will show dashboard)
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } else {
-                alert('❌ Invalid admin credentials or 2FA code!');
+            const code = document.getElementById('admin-code').value.trim();
+            if (!email || !password || !code) { alert('❌ Please fill in all fields'); return; }
+            const btn = document.querySelector('#admin-login .login-btn-submit');
+            const orig = btn.textContent; btn.textContent = 'Verifying...'; btn.disabled = true;
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, adminCode: code })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.ok) { alert('❌ ' + (data.error || 'Admin login failed')); btn.textContent = orig; btn.disabled = false; return; }
+                // Enforce admin/superadmin role on client too
+                if (data.user.role !== 'admin' && data.user.role !== 'superadmin') {
+                    alert('⛔ This account is not admin/superadmin (role: ' + data.user.role + ')');
+                    btn.textContent = orig; btn.disabled = false; return;
+                }
+                window.facilixAuth.setSession(data.token, data.user);
+                alert(`✅ Admin login: ${data.user.fullname} (${data.user.role})`);
+                setTimeout(() => { window.location.href = 'index.html'; }, 600);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Network error — is Deno server running?');
+                btn.textContent = orig; btn.disabled = false;
             }
         }
     </script>

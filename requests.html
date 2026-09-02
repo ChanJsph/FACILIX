@@ -12,89 +12,350 @@
             padding: 40px 20px;
         }
 
+        /* — now compact pill in nav bar — old header hidden, details in dropdown */
         .user-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
-            color: white;
-            padding: 30px 40px;
-            border-radius: 12px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: none !important;
         }
-
-        .user-info h2 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            color: #ccc;
-            font-size: 14px;
-        }
-
-        .logout-btn {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        .user-header-compact-note {
+            display: none;
         }
 
         .section-title {
             font-size: 28px;
             color: #0f2a47;
-            margin-bottom: 30px;
+            margin: 0;
             font-weight: 700;
+            line-height: 1.1;
         }
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        #adminHeaderNote {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            padding: 8px 12px;
+            border-radius: 999px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+        #adminHeaderNote .ahn-dot {
+            width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+        }
+        #adminHeaderNote .ahn-new { color: #0f2a47; display: inline-flex; align-items: center; gap: 6px; }
+        #adminHeaderNote .ahn-high { color: #991b1b; display: inline-flex; align-items: center; gap: 6px; }
+        #adminHeaderNote .ahn-sep { width: 1px; height: 14px; background: #e2e8f0; display: inline-block; }
+        #adminHeaderNote.urgent { border-color: #fecaca; background: #fef2f2; }
 
         .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
+            display: inline-flex;
+            gap: 6px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            padding: 6px;
+            border-radius: 999px;
+            box-shadow: 0 1px 4px rgba(15,42,71,0.04);
         }
 
         .filter-btn {
-            padding: 10px 20px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 6px;
+            padding: 8px 14px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 999px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            color: #0f2a47;
-        }
-
-        .filter-btn.active {
-            background: #ffc107;
-            border-color: #ffc107;
-            color: #0f2a47;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            font-weight: 700;
+            font-size: 13px;
+            line-height: 1;
+            color: #475569;
+            white-space: nowrap;
+            user-select: none;
+            letter-spacing: 0.1px;
         }
 
         .filter-btn:hover {
-            border-color: #ffc107;
-            background: #fffbf0;
+            background: #fff;
+            border-color: #e2e8f0;
+            color: #0f2a47;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(15,42,71,0.08);
         }
 
+        .filter-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .filter-btn.active {
+            background: #0f2a47;
+            border-color: #0f2a47;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(15,42,71,0.22);
+        }
+
+        .filter-btn.active:hover {
+            background: #1a3a57;
+            border-color: #1a3a57;
+            color: #fff;
+        }
+
+        /* status dot inside pills */
+        .filter-btn[data-status="pending"]::before,
+        .filter-btn[data-status="in-progress"]::before,
+        .filter-btn[data-status="completed"]::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+            transform: translateY(-0.5px);
+        }
+        .filter-btn[data-status="pending"]::before { background: #ffc107; box-shadow: 0 0 0 3px #fff3cd; }
+        .filter-btn[data-status="in-progress"]::before { background: #3b82f6; box-shadow: 0 0 0 3px #dbeafe; }
+        .filter-btn[data-status="completed"]::before { background: #10b981; box-shadow: 0 0 0 3px #d1fae5; }
+        .filter-btn.active[data-status="pending"]::before { box-shadow: 0 0 0 3px rgba(255,193,7,0.25); }
+        .filter-btn.active[data-status="in-progress"]::before { box-shadow: 0 0 0 3px rgba(59,130,246,0.25); }
+        .filter-btn.active[data-status="completed"]::before { box-shadow: 0 0 0 3px rgba(16,185,129,0.25); }
+
+        /* subtle count badge (populated by JS) */
+        .filter-btn .pill-count {
+            display: inline-grid;
+            place-items: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            margin-left: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            border-radius: 999px;
+            background: #eef2f7;
+            color: #475569;
+            vertical-align: middle;
+        }
+        .filter-btn.active .pill-count {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+        }
+        /* keyboard focus */
+        .filter-btn:focus-visible {
+            outline: 2px solid #ffc107;
+            outline-offset: 2px;
+        }
+
+        /* — compact, collapsible list — */
         .requests-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 40px;
         }
-
+        .req-row {
+            background: white;
+            border: 1px solid #eef2f7;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(15,42,71,0.06);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+        }
+        .req-row:hover {
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 16px rgba(15,42,71,0.10);
+        }
+        .req-row.expanded {
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 20px rgba(15,42,71,0.12);
+        }
+        .req-row-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s ease;
+        }
+        .req-row-header:hover { background: #f8fafc; }
+        .req-row-header:active { background: #f1f5f9; }
+        .req-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 4px transparent;
+        }
+        .req-dot.pending { background:#f59e0b; box-shadow:0 0 0 4px #fef3c7; }
+        .req-dot.in-progress { background:#3b82f6; box-shadow:0 0 0 4px #dbeafe; }
+        .req-dot.completed { background:#10b981; box-shadow:0 0 0 4px #d1fae5; }
+        .req-dot.rejected { background:#ef4444; box-shadow:0 0 0 4px #fee2e2; }
+        .req-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .req-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #0f2a47;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+        .req-sub {
+            font-size: 11.5px;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+        .req-sub span { white-space: nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .req-sub .sep { opacity:0.4; }
+        .req-complainant {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0;
+            min-width: 0;
+            max-width: 170px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f2a47;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            padding: 6px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .req-complainant .req-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #0f2a47;
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+        .req-priority {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 999px;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            flex-shrink: 0;
+        }
+        .req-priority.Low { background:#f1f5f9; color:#475569; border-color:#e2e8f0; }
+        .req-priority.Medium { background:#fffbeb; color:#92400e; border-color:#fde68a; }
+        .req-priority.High { background:#fef2f2; color:#991b1b; border-color:#fecaca; }
+        .req-priority.Urgent { background:#dc2626; color:white; border-color:#dc2626; }
+        .req-chevron {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), background 0.2s, color 0.2s;
+        }
+        .req-row.expanded .req-chevron { transform: rotate(180deg); background:#0f2a47; color:white; }
+        .req-id { font-size:11px; color:#94a3b8; font-weight:700; letter-spacing:0.2px; }
+        .req-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+            opacity: 0;
+            background: #fcfdff;
+            border-top: 1px solid transparent;
+        }
+        .req-row.expanded .req-body {
+            max-height: 560px;
+            opacity: 1;
+            border-top-color: #eef2f7;
+        }
+        .req-body-inner {
+            padding: 14px 16px 16px;
+            display: grid;
+            gap: 12px;
+        }
+        .req-desc {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.6;
+            background: white;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 12px 14px;
+            white-space: pre-wrap;
+        }
+        .req-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .req-meta-box {
+            background: white;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .req-meta-box strong {
+            font-size: 10px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+        }
+        .req-meta-box span {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #0f2a47;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .req-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .req-actions .btn-view, .req-actions .btn-edit {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        /* keep legacy .request-card for modals/fallback */
         .request-card {
             background: white;
             border: 1px solid #e0e0e0;
@@ -103,7 +364,6 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .request-card:hover {
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             transform: translateY(-6px);
@@ -266,10 +526,139 @@
             box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
         }
 
+        /* ===== NEW REQUEST FORM (redirect from Services) ===== */
+        .request-form-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,42,71,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .request-form-overlay.active {
+            display: flex;
+        }
+        .request-form-container {
+            background: white;
+            border-radius: 12px;
+            max-width: 720px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        .request-form-header {
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
+            color: white;
+            padding: 24px 28px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .request-form-header h2 { margin:0; font-size:22px; }
+        .request-form-header p { margin:6px 0 0; color:#ccc; font-size:13px; }
+        .btn-close-form {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: grid;
+            place-items: center;
+        }
+        .request-form-body { padding: 24px 28px 28px; }
+        .request-form-body .form-group { margin-bottom: 18px; }
+        .request-form-body label { display:block; font-weight:700; color:#0f2a47; margin-bottom:6px; font-size:13px; }
+        .request-form-body input[type="text"],
+        .request-form-body input[type="email"],
+        .request-form-body select,
+        .request-form-body textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .request-form-body input:focus,
+        .request-form-body select:focus,
+        .request-form-body textarea:focus {
+            outline:none; border-color:#ffc107; box-shadow: 0 0 0 3px rgba(255,193,7,0.15);
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 16px;
+            background: #f5f7fa;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #0f2a47;
+            cursor: pointer;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 18px; height: 18px;
+            accent-color: #0f2a47;
+            cursor: pointer;
+        }
+        .other-desc-wrap {
+            display: none;
+            margin-top: 10px;
+        }
+        .other-desc-wrap.active { display: block; }
+        .other-desc-wrap textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+        }
+        .btn-submit-request {
+            flex: 1;
+            background: #0f2a47;
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 6px;
+            font-weight:700;
+            cursor:pointer;
+            transition: all 0.2s;
+        }
+        .btn-submit-request:hover { background:#1a3a57; transform: translateY(-1px); }
+        .btn-cancel-request {
+            flex: 1;
+            background: white;
+            color: #0f2a47;
+            border: 1px solid #ddd;
+            padding: 13px;
+            border-radius: 6px;
+            font-weight:700;
+            cursor:pointer;
+        }
+
         @media (max-width: 768px) {
-            .requests-grid {
-                grid-template-columns: 1fr;
-            }
+            .requests-grid { gap: 8px; }
+            .req-meta-grid { grid-template-columns: repeat(2, 1fr); }
+            .req-row-header { padding: 10px 12px; gap: 8px; }
+            .req-complainant { max-width: 110px; padding: 4px 8px; font-size: 11px; }
+            .req-title { font-size: 13px; }
+            .req-sub { font-size: 11px; }
 
             .user-header {
                 flex-direction: column;
@@ -282,11 +671,18 @@
             }
 
             .filter-bar {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 6px;
+                overflow-x: auto;
+                scrollbar-width: none;
             }
+            .filter-bar::-webkit-scrollbar { display: none; }
 
             .filter-btn {
-                width: 100%;
+                width: auto;
+                flex: 0 0 auto;
             }
         }
     </style>
@@ -325,18 +721,166 @@
             <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
 
-        <!-- Section Title -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h1 class="section-title">My Requests</h1>
-            <button class="create-request-btn" onclick="createNewRequest()">+ New Request</button>
+        <!-- Section Title — admin: "Requests" + small note; user: "My Requests" + New Request -->
+        <div class="section-head" id="sectionHead">
+            <h1 class="section-title" id="sectionTitle">My Requests</h1>
+            <button class="create-request-btn" id="createRequestBtn" onclick="createNewRequest()">+ New Request</button>
+            <div id="adminHeaderNote" role="status" aria-live="polite">
+                <span class="ahn-new"><span class="ahn-dot" style="background:#3b82f6;box-shadow:0 0 0 3px #dbeafe"></span><span id="ahnNewText">0 new</span></span>
+                <span class="ahn-sep" aria-hidden="true"></span>
+                <span class="ahn-high"><span class="ahn-dot" style="background:#ef4444;box-shadow:0 0 0 3px #fee2e2"></span><span id="ahnHighText">0 high severity</span></span>
+            </div>
         </div>
 
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="filterRequests('all')">All</button>
-            <button class="filter-btn" onclick="filterRequests('pending')">Pending</button>
-            <button class="filter-btn" onclick="filterRequests('in-progress')">In Progress</button>
-            <button class="filter-btn" onclick="filterRequests('completed')">Completed</button>
+        <!-- Filter Bar — compact clickable pills -->
+        <div class="filter-bar" role="group" aria-label="Filter requests by status">
+            <button class="filter-btn active" data-status="all" onclick="filterRequests('all')" aria-pressed="true">All <span class="pill-count" id="pill-count-all">0</span></button>
+            <button class="filter-btn" data-status="pending" onclick="filterRequests('pending')" aria-pressed="false">Pending <span class="pill-count" id="pill-count-pending">0</span></button>
+            <button class="filter-btn" data-status="in-progress" onclick="filterRequests('in-progress')" aria-pressed="false">In Progress <span class="pill-count" id="pill-count-in-progress">0</span></button>
+            <button class="filter-btn" data-status="completed" onclick="filterRequests('completed')" aria-pressed="false">Completed <span class="pill-count" id="pill-count-completed">0</span></button>
+        </div>
+
+        <!-- New Request Form Overlay (from Services → Request) -->
+        <div class="request-form-overlay" id="requestFormOverlay">
+            <div class="request-form-container">
+                <div class="request-form-header">
+                    <div>
+                        <h2>📝 New Service Request</h2>
+                        <p id="requestFormSubtitle">Fill up the form to submit your complaint</p>
+                    </div>
+                    <button class="btn-close-form" onclick="closeRequestForm()" aria-label="Close">×</button>
+                </div>
+                <form class="request-form-body" id="newRequestForm" novalidate>
+                    <div class="form-group">
+                        <label for="reqCategory">Complaint Category *</label>
+                        <select id="reqCategory" required>
+                            <option value="">Select category</option>
+                            <option value="Fire Protection / DAS">Fire Protection / DAS</option>
+                            <option value="Physical Structures">Physical Structures</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Water / Sanitary / Fixtures">Water / Sanitary / Fixtures</option>
+                            <option value="Air Conditioning">Air Conditioning</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reqTitle">Request Title *</label>
+                        <input type="text" id="reqTitle" placeholder="e.g. AC not cooling in Room 301" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Service Type * <small style="font-weight:normal;color:#666">(check all that apply)</small></label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="svcNew" value="New Installation"> New Installation</label>
+                            <label class="checkbox-item"><input type="checkbox" id="svcRepair" value="Repair"> Repair</label>
+                            <label class="checkbox-item"><input type="checkbox" id="svcRehab" value="Rehabilitation"> Rehabilitation</label>
+                            <label class="checkbox-item"><input type="checkbox" id="svcOther" value="Other Services"> Other Services</label>
+                        </div>
+                        <div class="other-desc-wrap" id="otherDescWrap">
+                            <label for="otherDesc">Describe Other Service *</label>
+                            <textarea id="otherDesc" placeholder="Describe what you need... e.g. Custom fabrication, relocation, etc."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reqLocation">Location / Building *</label>
+                        <input type="text" id="reqLocation" placeholder="e.g. Building A, Floor 3, Room 301" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reqPriority">Priority</label>
+                        <select id="reqPriority">
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                            <option value="Low">Low</option>
+                            <option value="Urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reqDesc">Detailed Description *</label>
+                        <textarea id="reqDesc" rows="4" placeholder="Describe the issue, when it started, and any relevant details..." required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel-request" onclick="closeRequestForm()">Cancel</button>
+                        <button type="submit" class="btn-submit-request">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Request Details Popup — clean like request form (admin sees who sent) -->
+        <div class="request-form-overlay" id="requestDetailsOverlay">
+            <div class="request-form-container">
+                <div class="request-form-header">
+                    <div>
+                        <h2>📋 Request Details</h2>
+                        <p id="detailsSubtitle">Full complaint information</p>
+                    </div>
+                    <button class="btn-close-form" onclick="closeDetails()" aria-label="Close">×</button>
+                </div>
+                <div class="request-form-body" id="requestDetailsBody" style="padding: 20px 28px 24px;">
+                    <!-- populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Request Popup — same style as view form (superadmin: edit priority, assign technician, confirm pending) -->
+        <div class="request-form-overlay" id="editRequestOverlay">
+            <div class="request-form-container">
+                <div class="request-form-header">
+                    <div>
+                        <h2>✏️ Edit Request</h2>
+                        <p id="editSubtitle">Admin: update priority & assign technician</p>
+                    </div>
+                    <button class="btn-close-form" onclick="closeEdit()" aria-label="Close">×</button>
+                </div>
+                <div class="request-form-body" style="padding: 20px 28px 24px;">
+                    <form id="editRequestForm" novalidate>
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:14px;display:grid;gap:10px;margin-bottom:14px;">
+                            <div>
+                                <div style="font-size:11px;letter-spacing:0.6px;text-transform:uppercase;color:#64748b;font-weight:700;">Request</div>
+                                <div id="editReqTitle" style="font-size:18px;font-weight:800;color:#0f2a47;margin-top:4px;">-</div>
+                                <div id="editReqMeta" style="color:#64748b;font-size:12px;margin-top:4px;">-</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                                <span id="editReqStatus" class="request-status" style="white-space:nowrap;">-</span>
+                                <span id="editReqOwner" style="font-size:12px;color:#64748b;">-</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPriority">Priority *</label>
+                            <select id="editPriority" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                                <option value="Urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editTechnician">Assign Technician *</label>
+                            <select id="editTechnician" required>
+                                <option value="">Select technician</option>
+                            </select>
+                            <div class="hint" style="margin-top:6px;font-size:11px;color:#856404;background:#fff3cd;border:1px solid #ffc107;padding:6px 8px;border-radius:6px;">Choose who will handle this request (admin only).</div>
+                        </div>
+                        <div class="form-group" id="editStatusGroup">
+                            <label for="editStatus">Status</label>
+                            <select id="editStatus">
+                                <option value="pending">pending</option>
+                                <option value="in-progress">in-progress</option>
+                                <option value="completed">completed</option>
+                                <option value="rejected">rejected</option>
+                            </select>
+                        </div>
+                        <div id="confirmPendingWrap" style="display:none;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:12px;margin-top:10px;">
+                            <div style="font-size:13px;color:#92400e;font-weight:700;margin-bottom:8px;">⏳ This request is pending — confirm to accept?</div>
+                            <button type="button" id="confirmPendingBtn" class="btn-submit-request" style="width:100%;background:#059669;" onclick="confirmPending()">✅ Confirm & Accept (set to In Progress)</button>
+                        </div>
+                        <button type="button" class="btn-cancel-request" style="width:100%;margin-top:10px;color:#842029;border-color:#f8d7da;background:#fee2e2;" onclick="cancelRequestFromEdit()">🗑️ Cancel Request (Reject)</button>
+                        <div class="form-actions" style="margin-top:14px;">
+                            <button type="button" class="btn-cancel-request" onclick="closeEdit()">Close</button>
+                            <button type="submit" class="btn-submit-request">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- Requests Grid -->
@@ -354,32 +898,76 @@
     </div>
 
     <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
     <script src="scripts/nav.js"></script>
     <script>
-        // Check if user is logged in
-        function checkUserLogin() {
-            const user = getCurrentUser();
+        // Role-based access: user (complainant/technician) → home/services/about only; admin/superadmin → all
+        // For requests: allow all authenticated to create, but only admin sees ALL and can change/pause/cancel
+        async function checkUserLogin() {
+            let user = getCurrentUser();
+            try { const me = await window.facilixAuth.fetchMe(); if (me) user = me; } catch {}
             if (!user) {
                 alert('❌ Please login to access this page');
                 window.location.href = 'login.html';
-                return false;
+                return null;
             }
             return user;
         }
+        function isAdminRole(role) { return role === 'admin' || role === 'superadmin'; }
+        function syncSectionHead() {
+            try {
+                const user = getCurrentUser();
+                const isAdmin = !!(user && isAdminRole(user.role));
+                const title = document.getElementById('sectionTitle');
+                const btn = document.getElementById('createRequestBtn');
+                const note = document.getElementById('adminHeaderNote');
+                if (title) title.textContent = isAdmin ? 'Requests' : 'My Requests';
+                if (btn) btn.style.display = isAdmin ? 'none' : '';
+                if (note) note.style.display = isAdmin ? 'inline-flex' : 'none';
+                if (isAdmin && note) {
+                    const src = serverRequestsCache.length ? serverRequestsCache : getVisibleRequests();
+                    const newCount = src.filter(r => (r.status||'').toLowerCase() === 'pending').length;
+                    const highCount = src.filter(r => {
+                        const p = (r.priority||'').toLowerCase();
+                        const s = (r.status||'').toLowerCase();
+                        const isHigh = p === 'high' || p === 'urgent';
+                        const open = s !== 'completed' && s !== 'rejected';
+                        return isHigh && open;
+                    }).length;
+                    const nEl = document.getElementById('ahnNewText');
+                    const hEl = document.getElementById('ahnHighText');
+                    if (nEl) nEl.textContent = `${newCount} new`;
+                    if (hEl) hEl.textContent = `${highCount} high severity`;
+                    note.classList.toggle('urgent', highCount > 0);
+                    note.title = `${newCount} pending — ${highCount} high/urgent open`;
+                }
+            } catch {}
+        }
 
-        // Load user info on page load
-        window.addEventListener('load', () => {
-            const user = checkUserLogin();
+        // Load user info on page load + handle redirect from Services (service & category)
+        window.addEventListener('load', async () => {
+            const user = await checkUserLogin();
             if (user) {
                 document.getElementById('userName').textContent = user.fullname || 'User';
                 document.getElementById('userEmail').textContent = user.email;
-                document.getElementById('loginTime').textContent = user.loginTime;
-                
-                loadRequests();
+                document.getElementById('loginTime').textContent = user.loginTime || new Date().toLocaleString();
+                syncSectionHead();
+                applyMockOverrides();
+                await loadRequests();
+                syncSectionHead();
+
+                // If redirected from Services/Home with ?service=&category= or ?new=1, open form pre-filled (allowed for all)
+                const params = new URLSearchParams(window.location.search);
+                const cat = params.get('category');
+                const svc = params.get('service');
+                const isNew = params.get('new');
+                if (cat || svc || isNew) {
+                    setTimeout(() => openRequestForm(cat), 400);
+                }
             }
         });
 
-        // Mock requests data (in production, this would come from a backend)
+        // Demo data — treated as "all" for admin; complainant sees only own
         const mockRequests = [
             {
                 id: 'REQ-001',
@@ -390,7 +978,8 @@
                 priority: 'High',
                 createdDate: '2026-08-15',
                 dueDate: '2026-08-20',
-                assignedTo: 'John Smith'
+                assignedTo: 'John Smith',
+                owner: 'admin@facilix.com'
             },
             {
                 id: 'REQ-002',
@@ -401,18 +990,20 @@
                 priority: 'Medium',
                 createdDate: '2026-08-17',
                 dueDate: '2026-08-22',
-                assignedTo: 'Pending Assignment'
+                assignedTo: 'Pending Assignment',
+                owner: 'admin@facilix.com'
             },
             {
                 id: 'REQ-003',
-                title: 'Carpet Cleaning - Floor 3',
-                description: 'Deep carpet cleaning for entire 3rd floor',
+                title: 'Hallway Deep Cleaning - Floor 3',
+                description: 'Deep cleaning and mopping for entire 3rd floor hallway and common areas',
                 status: 'completed',
                 type: 'Cleaning',
                 priority: 'Low',
                 createdDate: '2026-08-10',
                 dueDate: '2026-08-16',
-                assignedTo: 'Maria Garcia'
+                assignedTo: 'Maria Garcia',
+                owner: 'technician@facilix.com'
             },
             {
                 id: 'REQ-004',
@@ -423,7 +1014,8 @@
                 priority: 'High',
                 createdDate: '2026-08-16',
                 dueDate: '2026-08-25',
-                assignedTo: 'Pending Assignment'
+                assignedTo: 'Pending Assignment',
+                owner: 'admin@facilix.com'
             },
             {
                 id: 'REQ-005',
@@ -434,114 +1026,758 @@
                 priority: 'Medium',
                 createdDate: '2026-08-12',
                 dueDate: '2026-08-19',
-                assignedTo: 'Robert Johnson'
+                assignedTo: 'Robert Johnson',
+                owner: 'technician@facilix.com'
             }
         ];
 
         let currentFilter = 'all';
+        let serverRequestsCache = []; // last fetched from API
+        let complainantOnlyMode = false;
 
-        // Load requests
-        function loadRequests() {
-            // In production, fetch from backend API
-            const requests = mockRequests;
-            renderRequests(requests);
+        // Per-user storage: only show what the current user requested (offline fallback)
+        function getCurrentUserKey() {
+            const u = getCurrentUser();
+            return (u?.email || u?.username || u?.userId || 'anon').toLowerCase();
+        }
+        function getMyStoredRequests() {
+            try {
+                const key = 'facilix_requests_' + getCurrentUserKey();
+                return JSON.parse(localStorage.getItem(key) || '[]');
+            } catch { return []; }
+        }
+        function getAuthHeaders() {
+            const t = localStorage.getItem('facilix_token');
+            return t ? { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+        }
+        // === SERVER FETCH: admin fetches all complainant requests via /api/requests?role=complainant ===
+        async function fetchRequestsFromServer(opts = {}) {
+            const token = localStorage.getItem('facilix_token');
+            if (!token) return null;
+            try {
+                // opts: { role, status } — for admin dashboard: { role: 'complainant' } fetches all complainant requests
+                const params = new URLSearchParams();
+                if (opts.role) params.set('role', opts.role);
+                if (opts.status && opts.status !== 'all') params.set('status', opts.status);
+                const qs = params.toString() ? '?' + params.toString() : '';
+                const res = await fetch('/api/requests' + qs, { headers: { 'Authorization': 'Bearer ' + token } });
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (data.ok && Array.isArray(data.requests)) {
+                    // normalize: ensure id, owner, etc. match existing shape
+                    return data.requests;
+                }
+            } catch (e) { console.warn('fetchRequestsFromServer failed', e); }
+            return null;
+        }
+        // Explicit helper required by spec: admin dashboard fetch all complainant requests
+        async function fetchComplainantRequests() {
+            return await fetchRequestsFromServer({ role: 'complainant' });
+        }
+        // expose for console/debug and admin dashboard
+        window.fetchComplainantRequests = fetchComplainantRequests;
+        window.fetchRequestsFromServer = fetchRequestsFromServer;
+
+        function saveMyRequestLocal(req) {
+            const key = 'facilix_requests_' + getCurrentUserKey();
+            const arr = getMyStoredRequests();
+            arr.unshift(req);
+            localStorage.setItem(key, JSON.stringify(arr));
+            try {
+                const globalKey = 'facilix_all_user_requests';
+                const all = JSON.parse(localStorage.getItem(globalKey) || '[]');
+                all.unshift(req);
+                localStorage.setItem(globalKey, JSON.stringify(all));
+            } catch {}
+        }
+        async function saveMyRequest(req) {
+            // Try server first
+            try {
+                const token = localStorage.getItem('facilix_token');
+                if (token) {
+                    const res = await fetch('/api/requests', {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({
+                            title: req.title,
+                            description: req.description,
+                            category: req.category,
+                            type: req.type,
+                            otherServiceDesc: req.otherServiceDesc,
+                            location: req.location,
+                            priority: req.priority
+                        })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.ok && data.request) {
+                            // keep local copy for offline fallback
+                            saveMyRequestLocal(data.request);
+                            serverRequestsCache.unshift(data.request);
+                            return data.request;
+                        }
+                    }
+                }
+            } catch (e) { console.warn('save to server failed, fallback to local', e); }
+            saveMyRequestLocal(req);
+            return req;
+        }
+        function getVisibleRequests() {
+            // Fallback sync source (localStorage + mock) — used when offline
+            const user = getCurrentUser();
+            const role = user?.role || '';
+            const isAdmin = role === 'admin' || role === 'superadmin';
+            if (isAdmin) {
+                let allStored = [];
+                try { allStored = JSON.parse(localStorage.getItem('facilix_all_user_requests') || '[]'); } catch {}
+                try {
+                    const seen = new Set(allStored.map(r => r.id));
+                    for (let i=0; i<localStorage.length; i++) {
+                        const k = localStorage.key(i);
+                        if (k && k.startsWith('facilix_requests_')) {
+                            const arr = JSON.parse(localStorage.getItem(k) || '[]');
+                            arr.forEach(r => { if (!seen.has(r.id)) { allStored.push(r); seen.add(r.id); } });
+                        }
+                    }
+                } catch {}
+                // If server cache has data, prefer it (it already contains all complainant requests)
+                if (serverRequestsCache.length > 0) {
+                    const seen = new Set(serverRequestsCache.map(r => r.id));
+                    const merged = [...serverRequestsCache];
+                    // add local not yet on server
+                    allStored.forEach(r => { if (!seen.has(r.id)) merged.push(r); });
+                    // add mocks not in server
+                    mockRequests.forEach(r => { if (!seen.has(r.id) && !merged.some(m => m.id===r.id)) merged.push(r); });
+                    return merged;
+                }
+                return [...allStored, ...mockRequests];
+            }
+            // For complainant/technician: prefer server cache if available
+            if (serverRequestsCache.length > 0) return serverRequestsCache;
+            return getMyStoredRequests();
         }
 
-        // Filter requests
-        function filterRequests(filter) {
+        // Load requests — admin fetches ALL complainant requests from server; others fetch own
+        async function loadRequests() {
+            applyMockOverrides();
+            // Try server first (covers cross-device/WAN persistence)
+            const user = getCurrentUser();
+            const isAdmin = user && (user.role === 'admin' || user.role === 'superadmin');
+            let serverData = null;
+            if (isAdmin && complainantOnlyMode) {
+                serverData = await fetchComplainantRequests();
+            } else {
+                serverData = await fetchRequestsFromServer();
+            }
+            if (serverData) {
+                serverRequestsCache = serverData;
+                // keep filtered view
+                let filtered = serverData;
+                if (currentFilter !== 'all') filtered = serverData.filter(r => r.status === currentFilter);
+                if (complainantOnlyMode && isAdmin) {
+                    // already filtered by role on server, but keep local extra filter if needed
+                    filtered = filtered; // server already did role=complainant
+                }
+                renderRequests(filtered);
+                return;
+            }
+            // offline fallback
+            const requests = getVisibleRequests();
+            let filtered = requests;
+            if (currentFilter !== 'all') filtered = requests.filter(r => r.status === currentFilter);
+            renderRequests(filtered);
+        }
+        // Auto-reflect new user requests in admin while admin stays on page (same browser) — listens storage + polls server
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'facilix_all_user_requests' || (e.key && e.key.startsWith('facilix_requests_')) || e.key === 'facilix_mock_request_overrides') {
+                try {
+                    const u = getCurrentUser();
+                    if (u && isAdminRole(u.role)) {
+                        loadRequests();
+                    }
+                } catch {}
+            }
+        });
+        // Poll server for admin so complainant submissions appear instantly without reload (cross-device)
+        let _lastAdminSig = '';
+        setInterval(async () => {
+            try {
+                const u = getCurrentUser();
+                if (!u || !isAdminRole(u.role)) return;
+                const serverData = complainantOnlyMode ? await fetchComplainantRequests() : await fetchRequestsFromServer();
+                if (!serverData) {
+                    const vis = getVisibleRequests();
+                    const sig = vis.map(r => r.id + '|' + r.status + '|' + r.priority + '|' + r.assignedTo + '|' + (r.owner||'')).join(';');
+                    if (sig !== _lastAdminSig) {
+                        _lastAdminSig = sig;
+                        if (currentFilter === 'all') renderRequests(vis);
+                        else renderRequests(vis.filter(r => r.status === currentFilter));
+                    }
+                    return;
+                }
+                const sig2 = serverData.map(r => r.id + '|' + r.status + '|' + r.priority + '|' + r.assignedTo + '|' + (r.owner||'')).join(';');
+                if (sig2 !== _lastAdminSig) {
+                    _lastAdminSig = sig2;
+                    serverRequestsCache = serverData;
+                    let filtered = serverData;
+                    if (currentFilter !== 'all') filtered = serverData.filter(r => r.status === currentFilter);
+                    renderRequests(filtered);
+                }
+            } catch {}
+        }, 2000);
+
+        // Update pill counts + aria-pressed
+        function updatePillCounts(allRequests) {
+            const src = Array.isArray(allRequests) ? allRequests : (serverRequestsCache.length ? serverRequestsCache : getVisibleRequests());
+            const counts = { all: src.length, pending: 0, 'in-progress': 0, completed: 0 };
+            src.forEach(r => { if (r.status in counts) counts[r.status]++; });
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = String(v); };
+            set('pill-count-all', counts.all);
+            set('pill-count-pending', counts.pending);
+            set('pill-count-in-progress', counts['in-progress']);
+            set('pill-count-completed', counts.completed);
+        }
+        function syncPillAria() {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                const isActive = b.classList.contains('active');
+                b.setAttribute('aria-pressed', String(isActive));
+            });
+        }
+
+        // Filter requests — per-user + status (async for admin server fetch) — now compact pills
+        async function filterRequests(filter) {
             currentFilter = filter;
-            
-            // Update active button
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
-            
-            // Filter and render
-            let filtered = mockRequests;
-            if (filter !== 'all') {
-                filtered = mockRequests.filter(req => req.status === filter);
+            const activeBtn = (typeof event !== 'undefined' && event?.target?.closest?.('.filter-btn')) || document.querySelector(`.filter-btn[data-status="${filter}"]`) || document.querySelector(`.filter-btn[onclick*="'${filter}'"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            syncPillAria();
+            // Try server for fresh data
+            const serverData = complainantOnlyMode ? await fetchComplainantRequests() : await fetchRequestsFromServer();
+            if (serverData) {
+                serverRequestsCache = serverData;
+                let filtered = serverData;
+                if (filter !== 'all') filtered = serverData.filter(req => req.status === filter);
+                renderRequests(filtered);
+                return;
             }
-            
+            // fallback
+            let filtered = getVisibleRequests();
+            if (filter !== 'all') {
+                filtered = getVisibleRequests().filter(req => req.status === filter);
+            }
             renderRequests(filtered);
         }
+        // Admin toggle: fetch all complainant requests only (exposes requirement)
+        async function filterComplainantOnly(enable) {
+            complainantOnlyMode = !!enable;
+            const btn = document.getElementById('complainantFilterBtn');
+            if (btn) {
+                btn.classList.toggle('active', complainantOnlyMode);
+                btn.setAttribute('aria-pressed', String(complainantOnlyMode));
+            }
+            await loadRequests();
+        }
+        window.filterComplainantOnly = filterComplainantOnly;
 
-        // Render requests to the grid
+        function escapeHtml(s) {
+            return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        function toggleReqRow(id) {
+            const row = document.getElementById('req-row-' + id);
+            if (!row) return;
+            const wasExpanded = row.classList.contains('expanded');
+            // collapse others for density (single-expand)
+            document.querySelectorAll('.req-row.expanded').forEach(r => r.classList.remove('expanded'));
+            if (!wasExpanded) row.classList.add('expanded');
+        }
+        window.toggleReqRow = toggleReqRow;
+
+        // Render requests — compact collapsible list (admin dashboard compaction)
         function renderRequests(requests) {
             const grid = document.getElementById('requestsGrid');
             const emptyState = document.getElementById('emptyState');
-            
+            try { updatePillCounts(serverRequestsCache.length ? serverRequestsCache : null); } catch {}
+            try { syncSectionHead(); } catch {}
             if (requests.length === 0) {
                 grid.style.display = 'none';
                 emptyState.style.display = 'block';
+                grid.innerHTML = '';
+                try { syncSectionHead(); } catch {}
                 return;
             }
-            
-            grid.style.display = 'grid';
+            grid.style.display = 'flex';
             emptyState.style.display = 'none';
             grid.innerHTML = '';
-            
+            const curRole = (window.facilixAuth && window.facilixAuth.getRole && window.facilixAuth.getRole()) || (getCurrentUser()?.role) || '';
+            const isAdmin = curRole === 'admin' || curRole === 'superadmin';
             requests.forEach(request => {
-                const statusClass = `status-${request.status.replace(' ', '-')}`;
-                const card = document.createElement('div');
-                card.className = 'request-card';
-                card.innerHTML = `
-                    <div class="request-header">
-                        <span class="request-id">${request.id}</span>
-                        <span class="request-status ${statusClass}">${request.status.replace('-', ' ')}</span>
+                const statusKey = (request.status || 'pending').toLowerCase();
+                const dotClass = statusKey === 'in-progress' ? 'in-progress' : statusKey;
+                const prio = request.priority || 'Medium';
+                const owner = request.owner || request.owner_email || 'Unknown';
+                const ownerShort = owner.includes('@') ? owner.split('@')[0] : owner;
+                const avatarLetter = (ownerShort[0] || 'U').toUpperCase();
+                const cat = request.category || request.type || '';
+                const loc = request.location || '';
+                const due = request.dueDate || request.due_date || '';
+                const complainantPill = isAdmin
+                    ? `<span class="req-complainant" title="${escapeHtml(owner)}"><span class="req-avatar">${escapeHtml(avatarLetter)}</span><span style="overflow:hidden;text-overflow:ellipsis;">${escapeHtml(ownerShort)}</span></span>`
+                    : ``;
+                const row = document.createElement('div');
+                row.className = 'req-row';
+                row.id = 'req-row-' + request.id;
+                row.innerHTML = `
+                    <div class="req-row-header" onclick="toggleReqRow('${request.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReqRow('${request.id}')}" aria-expanded="false">
+                        <span class="req-dot ${dotClass}" aria-hidden="true"></span>
+                        <div class="req-main">
+                            <div class="req-title">${escapeHtml(request.title)}</div>
+                            <div class="req-sub">
+                                <span class="req-id">${escapeHtml(request.id)}</span>
+                                ${cat ? `<span class="sep">•</span><span>${escapeHtml(cat)}</span>` : ``}
+                                ${loc ? `<span class="sep">•</span><span>${escapeHtml(loc)}</span>` : ``}
+                                ${due ? `<span class="sep">•</span><span>Due ${escapeHtml(due)}</span>` : ``}
+                            </div>
+                        </div>
+                        ${complainantPill}
+                        <span class="req-priority ${escapeHtml(prio)}">${escapeHtml(prio)}</span>
+                        <span class="req-chevron" aria-hidden="true">⌄</span>
                     </div>
-                    <h3 class="request-title">${request.title}</h3>
-                    <p class="request-description">${request.description}</p>
-                    <div class="request-meta">
-                        <span>
-                            <strong>Type</strong>
-                            ${request.type}
-                        </span>
-                        <span>
-                            <strong>Priority</strong>
-                            ${request.priority}
-                        </span>
-                        <span>
-                            <strong>Assigned</strong>
-                            ${request.assignedTo}
-                        </span>
-                    </div>
-                    <div class="request-meta">
-                        <span>
-                            <strong>Created</strong>
-                            ${request.createdDate}
-                        </span>
-                        <span>
-                            <strong>Due Date</strong>
-                            ${request.dueDate}
-                        </span>
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-view" onclick="viewRequest('${request.id}')">View Details</button>
-                        <button class="btn-edit" onclick="editRequest('${request.id}')">Edit</button>
+                    <div class="req-body">
+                        <div class="req-body-inner">
+                            <div class="req-desc">${escapeHtml(request.description || 'No description')}</div>
+                            <div class="req-meta-grid">
+                                <div class="req-meta-box"><strong>Category</strong><span>${escapeHtml(cat || '-')}</span></div>
+                                <div class="req-meta-box"><strong>Type</strong><span>${escapeHtml(request.type || '-')}</span></div>
+                                <div class="req-meta-box"><strong>Assigned</strong><span>${escapeHtml(request.assignedTo || 'Pending Assignment')}</span></div>
+                                <div class="req-meta-box"><strong>Created</strong><span>${escapeHtml(request.createdDate || due || '-')}</span></div>
+                            </div>
+                            ${isAdmin ? `<div style="font-size:11px;color:#64748b;background:#fffbeb;border:1px solid #fde68a;padding:6px 10px;border-radius:8px;">👤 ${escapeHtml(owner)}${request.status ? ` • ${escapeHtml(request.status)}` : ''}</div>` : ``}
+                            <div class="req-actions">
+                                <button class="btn-view" onclick="event.stopPropagation(); viewRequest('${request.id}')">View Details</button>
+                                ${isAdmin ? `<button class="btn-edit" onclick="event.stopPropagation(); editRequest('${request.id}')">Edit</button>` : ``}
+                            </div>
+                        </div>
                     </div>
                 `;
-                grid.appendChild(card);
+                // keep aria-expanded in sync
+                const header = row.querySelector('.req-row-header');
+                const observer = new MutationObserver(() => {
+                    if (header) header.setAttribute('aria-expanded', row.classList.contains('expanded') ? 'true' : 'false');
+                });
+                observer.observe(row, { attributes: true, attributeFilter: ['class'] });
+                grid.appendChild(row);
             });
+            try { syncSectionHead(); } catch {}
         }
 
-        // View request details
+        // View request details — clean popup like request form (admin sees who sent; superadmin can edit)
+        // Now prefers server cache so admin sees latest complainant data
         function viewRequest(requestId) {
-            const request = mockRequests.find(r => r.id === requestId);
-            if (request) {
-                alert(`📋 Request Details\n\nID: ${request.id}\nTitle: ${request.title}\nStatus: ${request.status}\nAssigned to: ${request.assignedTo}\nDue: ${request.dueDate}`);
+            // prefer server cache, fallback to local
+            let request = (serverRequestsCache.find(r => r.id === requestId)) || getVisibleRequests().find(r => r.id === requestId) || mockRequests.find(r => r.id === requestId);
+            if (!request) return;
+            const curUser = getCurrentUser();
+            const isAdmin = isAdminRole((curUser?.role) || '');
+            const owner = request.owner || 'Unknown';
+            let senderName = owner;
+            if (!isAdmin) senderName = 'You';
+            else if (curUser && owner.toLowerCase() === (curUser.email || curUser.username || '').toLowerCase()) senderName = owner + ' (you)';
+            const statusClass = `status-${request.status.replace(' ', '-')}`;
+            const body = document.getElementById('requestDetailsBody');
+            const sub = document.getElementById('detailsSubtitle');
+            if (sub) sub.textContent = `${request.id} — ${request.status.replace('-',' ')} • ${request.category || request.type || ''}`;
+            body.innerHTML = `
+                <div style="display:grid;gap:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                        <div>
+                            <div style="font-size:11px;letter-spacing:0.6px;text-transform:uppercase;color:#64748b;font-weight:700;">Request</div>
+                            <div style="font-size:18px;font-weight:800;color:#0f2a47;margin-top:4px;">${request.title}</div>
+                            <div style="color:#64748b;font-size:12px;margin-top:4px;">${request.category ? `📂 ${request.category}` : ''} ${request.location ? `• 📍 ${request.location}` : ''}</div>
+                        </div>
+                        <span class="request-status ${statusClass}" style="white-space:nowrap;">${request.status.replace('-',' ')}</span>
+                    </div>
+
+                    <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:14px;display:grid;gap:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="width:32px;height:32px;border-radius:50%;background:#0f2a47;color:white;display:grid;place-items:center;font-weight:800;font-size:13px;">${(senderName[0]||'U').toUpperCase()}</span>
+                            <div>
+                                <div style="font-size:13px;font-weight:700;color:#0f2a47;">👤 Sent by: ${senderName}</div>
+                                ${isAdmin ? `<div style="font-size:11px;color:#64748b;">${owner} ${owner !== senderName ? '' : ''} • ${request.category || ''}</div>` : `<div style="font-size:11px;color:#64748b;">Your request</div>`}
+                            </div>
+                        </div>
+                        ${request.type ? `<div style="font-size:12px;color:#0f2a47;"><strong>Service Types:</strong> ${request.type}</div>` : ''}
+                        ${request.otherServiceDesc ? `<div style="font-size:12px;color:#0f2a47;background:white;border:1px solid #e2e8f0;padding:8px 10px;border-radius:6px;"><strong>Other:</strong> ${request.otherServiceDesc}</div>` : ''}
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;">
+                            <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Priority</div>
+                            <div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${request.priority || '-'}</div>
+                        </div>
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;">
+                            <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Assigned</div>
+                            <div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${request.assignedTo || 'Pending'}</div>
+                        </div>
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;">
+                            <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Created</div>
+                            <div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${request.createdDate || '-'}</div>
+                        </div>
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;">
+                            <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Due</div>
+                            <div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${request.dueDate || '-'}</div>
+                        </div>
+                    </div>
+
+                    <div style="background:white;border:1px solid #eef2f7;border-radius:8px;padding:14px;">
+                        <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Description</div>
+                        <div style="font-size:13px;color:#334155;line-height:1.6;white-space:pre-wrap;">${request.description || '-'}</div>
+                    </div>
+
+                    ${isAdmin ? `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;color:#92400e;font-size:12px;">🔒 Admin view: you see who sent this request (${owner}). Only admin can change/pause/cancel.</div>` : ''}
+
+                    <div style="display:flex;gap:10px;margin-top:4px;">
+                        <button class="btn-cancel-request" style="${isAdmin ? 'flex:1;' : 'width:100%;'}" onclick="closeDetails()">Close</button>
+                        ${isAdmin ? `<button class="btn-submit-request" style="flex:1;" onclick="closeDetails(); editRequest('${request.id}')">Edit (Admin)</button>` : ``}
+                    </div>
+                </div>
+            `;
+            document.getElementById('requestDetailsOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDetails() {
+            document.getElementById('requestDetailsOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ===== Superadmin Edit — same popup style as view (priority + assign technician + confirm pending) =====
+        let editingRequestId = null;
+        function applyMockOverrides() {
+            try {
+                const overrides = JSON.parse(localStorage.getItem('facilix_mock_request_overrides') || '{}');
+                mockRequests.forEach((r, idx) => {
+                    if (overrides[r.id]) mockRequests[idx] = { ...r, ...overrides[r.id] };
+                });
+            } catch {}
+        }
+        async function findAndUpdateRequest(requestId, updates) {
+            // Try server first (admin updating complainant requests)
+            try {
+                const token = localStorage.getItem('facilix_token');
+                if (token) {
+                    const res = await fetch('/api/requests/' + encodeURIComponent(requestId), {
+                        method: 'PUT',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify(updates)
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.ok && data.request) {
+                            // sync cache
+                            const idx = serverRequestsCache.findIndex(r => r.id === requestId);
+                            if (idx !== -1) serverRequestsCache[idx] = { ...serverRequestsCache[idx], ...data.request };
+                            // also keep local fallback in sync
+                        }
+                    }
+                }
+            } catch (e) { console.warn('server update failed, fallback to local', e); }
+            let updated = false;
+            try {
+                const globalKey = 'facilix_all_user_requests';
+                let all = JSON.parse(localStorage.getItem(globalKey) || '[]');
+                const idx = all.findIndex(r => r.id === requestId);
+                if (idx !== -1) {
+                    all[idx] = { ...all[idx], ...updates };
+                    localStorage.setItem(globalKey, JSON.stringify(all));
+                    const owner = all[idx].owner;
+                    if (owner) {
+                        const userKey = 'facilix_requests_' + owner.toLowerCase();
+                        let per = JSON.parse(localStorage.getItem(userKey) || '[]');
+                        const pIdx = per.findIndex(r => r.id === requestId);
+                        if (pIdx !== -1) { per[pIdx] = { ...per[pIdx], ...updates }; localStorage.setItem(userKey, JSON.stringify(per)); }
+                    }
+                    updated = true;
+                }
+            } catch {}
+            const mockIdx = mockRequests.findIndex(r => r.id === requestId);
+            if (mockIdx !== -1) {
+                mockRequests[mockIdx] = { ...mockRequests[mockIdx], ...updates };
+                try {
+                    const mockKey = 'facilix_mock_request_overrides';
+                    let overrides = JSON.parse(localStorage.getItem(mockKey) || '{}');
+                    overrides[requestId] = { ...(overrides[requestId]||{}), ...updates };
+                    localStorage.setItem(mockKey, JSON.stringify(overrides));
+                } catch {}
+                updated = true;
+            }
+            if (!updated) {
+                for (let i=0; i<localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith('facilix_requests_')) {
+                        try {
+                            let arr = JSON.parse(localStorage.getItem(k) || '[]');
+                            const idx2 = arr.findIndex(r => r.id === requestId);
+                            if (idx2 !== -1) {
+                                arr[idx2] = { ...arr[idx2], ...updates };
+                                localStorage.setItem(k, JSON.stringify(arr));
+                                try {
+                                    const gk='facilix_all_user_requests'; let all2=JSON.parse(localStorage.getItem(gk)||'[]');
+                                    const gIdx=all2.findIndex(r=>r.id===requestId); if(gIdx!==-1){all2[gIdx]={...all2[gIdx],...updates}; localStorage.setItem(gk, JSON.stringify(all2));}
+                                } catch {}
+                                updated=true; break;
+                            }
+                        } catch {}
+                    }
+                }
+            }
+            // also update server cache directly for instant UI
+            const cIdx = serverRequestsCache.findIndex(r => r.id === requestId);
+            if (cIdx !== -1) serverRequestsCache[cIdx] = { ...serverRequestsCache[cIdx], ...updates };
+            return updated;
+        }
+        async function populateTechnicianSelect(selectedValue) {
+            const sel = document.getElementById('editTechnician');
+            sel.innerHTML = '<option value="">Select technician</option><option value="Pending Assignment">Pending Assignment</option>';
+            try {
+                const local = JSON.parse(localStorage.getItem('facilix_technicians_local') || '[]');
+                local.forEach(t => {
+                    const name = t.name;
+                    if (!Array.from(sel.options).some(o=>o.value===name)) {
+                        const opt=document.createElement('option'); opt.value=name; opt.textContent=name+' (local)'; sel.appendChild(opt);
+                    }
+                });
+            } catch {}
+            try {
+                const token=localStorage.getItem('facilix_token');
+                const res=await fetch('/api/auth/users', { headers: token?{ 'Authorization':'Bearer '+token }:{} });
+                const data=await res.json();
+                if(data.ok && Array.isArray(data.users)){
+                    data.users.filter(u=>u.role==='technician'||u.role==='admin').forEach(u=>{
+                        const name=u.fullname||u.username;
+                        if(!Array.from(sel.options).some(o=>o.value===name)){
+                            const opt=document.createElement('option'); opt.value=name; opt.textContent=name+` (${u.role})`; sel.appendChild(opt);
+                        }
+                    });
+                }
+            } catch {}
+            if(selectedValue && !Array.from(sel.options).some(o=>o.value===selectedValue)){
+                const opt=document.createElement('option'); opt.value=selectedValue; opt.textContent=selectedValue; sel.appendChild(opt);
+            }
+            if(selectedValue) sel.value=selectedValue;
+        }
+        function closeEdit() {
+            document.getElementById('editRequestOverlay').classList.remove('active');
+            document.body.style.overflow='';
+            editingRequestId=null;
+        }
+        async function editRequest(requestId) {
+            const role = (window.facilixAuth && window.facilixAuth.getRole && window.facilixAuth.getRole()) || (getCurrentUser()?.role) || '';
+            if (role !== 'admin' && role !== 'superadmin') {
+                alert('⛔ Only admin can change/edit/cancel requests. Your role: ' + role);
+                return;
+            }
+            // Prefer server cache so admin edits latest complainant data
+            let request = serverRequestsCache.find(r => r.id === requestId) || getVisibleRequests().find(r => r.id === requestId) || mockRequests.find(r => r.id === requestId);
+            // Try fetch single from server for freshest (esp. complainant requests)
+            try {
+                const token = localStorage.getItem('facilix_token');
+                if (token) {
+                    const res = await fetch('/api/requests/' + encodeURIComponent(requestId), { headers: { 'Authorization': 'Bearer ' + token } });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.ok && data.request) request = data.request;
+                    }
+                }
+            } catch {}
+            if (!request) { alert('❌ Request not found'); return; }
+            editingRequestId = requestId;
+            document.getElementById('editReqTitle').textContent = request.title;
+            document.getElementById('editReqMeta').textContent = `${request.category || request.type || ''} ${request.location ? '• '+request.location : ''}`;
+            const statusClass = `status-${(request.status||'pending').replace(' ', '-')}`;
+            const statusEl = document.getElementById('editReqStatus');
+            statusEl.textContent = (request.status||'pending').replace('-',' ');
+            statusEl.className = 'request-status ' + statusClass;
+            document.getElementById('editReqOwner').textContent = `👤 ${request.owner || 'Unknown'}`;
+            document.getElementById('editPriority').value = request.priority || 'Medium';
+            document.getElementById('editStatus').value = request.status || 'pending';
+            await populateTechnicianSelect(request.assignedTo);
+            const isPending = (request.status || '').toLowerCase() === 'pending';
+            document.getElementById('confirmPendingWrap').style.display = isPending ? 'block' : 'none';
+            document.getElementById('editSubtitle').textContent = `${request.id} — admin edit`;
+            document.getElementById('editRequestOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        async function confirmPending() {
+            if (!editingRequestId) return;
+            const tech = document.getElementById('editTechnician').value.trim();
+            if (!tech) { alert('❌ Select a technician to assign before confirming'); return; }
+            const prio = document.getElementById('editPriority').value;
+            await findAndUpdateRequest(editingRequestId, { status: 'in-progress', priority: prio, assignedTo: tech });
+            closeEdit();
+            await loadRequests();
+            alert('✅ Request confirmed! Status → In Progress, assigned to ' + tech);
+        }
+        async function cancelRequestFromEdit() {
+            if (!editingRequestId) return;
+            if (!confirm('🗑️ Cancel this request? It will be marked as rejected.')) return;
+            await findAndUpdateRequest(editingRequestId, { status: 'rejected' });
+            closeEdit();
+            await loadRequests();
+            alert('🗑️ Request cancelled (rejected)');
+        }
+
+        // ===== New Request Form (from Services) =====
+        function openRequestForm(prefillCategory) {
+            const overlay = document.getElementById('requestFormOverlay');
+            const catSel = document.getElementById('reqCategory');
+            const subtitle = document.getElementById('requestFormSubtitle');
+            // Prefill category if coming from Services card
+            if (prefillCategory && catSel) {
+                // Ensure option exists (add if needed)
+                let opt = Array.from(catSel.options).find(o => o.value === prefillCategory);
+                if (!opt) {
+                    opt = document.createElement('option');
+                    opt.value = prefillCategory;
+                    opt.textContent = prefillCategory;
+                    catSel.appendChild(opt);
+                }
+                catSel.value = prefillCategory;
+                subtitle.textContent = `Category: ${prefillCategory} — fill up the form`;
+            } else {
+                subtitle.textContent = 'Fill up the form to submit your complaint';
+                if (catSel) catSel.value = '';
+            }
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // focus first field
+            setTimeout(() => document.getElementById('reqTitle')?.focus(), 100);
+        }
+        function closeRequestForm() {
+            document.getElementById('requestFormOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('newRequestForm').reset();
+            document.getElementById('otherDescWrap').classList.remove('active');
+            document.getElementById('otherDesc').required = false;
+            // clear URL params without reload
+            if (window.location.search.includes('category') || window.location.search.includes('service')) {
+                history.replaceState({}, '', window.location.pathname);
             }
         }
-
-        // Edit request
-        function editRequest(requestId) {
-            alert(`✏️ Edit feature for ${requestId} coming soon!`);
-        }
-
-        // Create new request
         function createNewRequest() {
-            alert('📝 Create Request dialog coming soon!\n\nYou will be able to submit a new facility request here.');
+            openRequestForm();
         }
+        // Toggle Other Services description line
+        document.getElementById('svcOther')?.addEventListener('change', function() {
+            const wrap = document.getElementById('otherDescWrap');
+            const ta = document.getElementById('otherDesc');
+            if (this.checked) {
+                wrap.classList.add('active');
+                ta.required = true;
+                ta.focus();
+            } else {
+                wrap.classList.remove('active');
+                ta.required = false;
+                ta.value = '';
+            }
+        });
+        // Close on overlay click
+        document.getElementById('requestFormOverlay')?.addEventListener('click', function(e) {
+            if (e.target === this) closeRequestForm();
+        });
+        // ESC to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('requestFormOverlay').classList.contains('active')) {
+                closeRequestForm();
+            }
+        });
+        // Details popup — same clean style as request form
+        document.getElementById('requestDetailsOverlay')?.addEventListener('click', function(e) {
+            if (e.target === this) closeDetails();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('requestDetailsOverlay')?.classList.contains('active')) {
+                closeDetails();
+            }
+        });
+        // Edit popup — same overlay style as view/request form (superadmin)
+        document.getElementById('editRequestOverlay')?.addEventListener('click', function(e) {
+            if (e.target === this) closeEdit();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('editRequestOverlay')?.classList.contains('active')) {
+                closeEdit();
+            }
+        });
+        document.getElementById('editRequestForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!editingRequestId) return;
+            const prio = document.getElementById('editPriority').value;
+            const tech = document.getElementById('editTechnician').value.trim();
+            if (!tech) { alert('❌ Select a technician'); return; }
+            const status = document.getElementById('editStatus').value || undefined;
+            const updates = { priority: prio, assignedTo: tech };
+            if (status) updates.status = status;
+            await findAndUpdateRequest(editingRequestId, updates);
+            closeEdit();
+            await loadRequests();
+            alert('✅ Saved! Priority → ' + prio + ', Assigned → ' + tech + (status ? ', Status → ' + status : ''));
+        });
+        // Submit new request — now persists to SQLite via POST /api/requests (admin will fetch it)
+        document.getElementById('newRequestForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const category = document.getElementById('reqCategory').value;
+            const title = document.getElementById('reqTitle').value.trim();
+            const location = document.getElementById('reqLocation').value.trim();
+            const priority = document.getElementById('reqPriority').value;
+            const desc = document.getElementById('reqDesc').value.trim();
+            const svcNew = document.getElementById('svcNew').checked;
+            const svcRepair = document.getElementById('svcRepair').checked;
+            const svcRehab = document.getElementById('svcRehab').checked;
+            const svcOther = document.getElementById('svcOther').checked;
+            const otherDesc = document.getElementById('otherDesc').value.trim();
+
+            if (!category) { alert('❌ Please select a complaint category'); return; }
+            if (!title) { alert('❌ Please enter a title'); return; }
+            if (!svcNew && !svcRepair && !svcRehab && !svcOther) { alert('❌ Check at least one Service Type (New Installation, Repair, Rehabilitation, Other)'); return; }
+            if (svcOther && !otherDesc) { alert('❌ Describe Other Service'); document.getElementById('otherDesc').focus(); return; }
+            if (!desc) { alert('❌ Please enter detailed description'); return; }
+
+            const types = [];
+            if (svcNew) types.push('New Installation');
+            if (svcRepair) types.push('Repair');
+            if (svcRehab) types.push('Rehabilitation');
+            if (svcOther) types.push(`Other: ${otherDesc}`);
+
+            const newReq = {
+                id: 'REQ-' + String(Date.now()).slice(-5),
+                title: title,
+                description: desc,
+                status: 'pending',
+                type: types.join(', '),
+                category: category,
+                otherServiceDesc: svcOther ? otherDesc : '',
+                location: location,
+                priority: priority,
+                createdDate: new Date().toISOString().split('T')[0],
+                dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0],
+                assignedTo: 'Pending Assignment',
+                owner: getCurrentUserKey()
+            };
+            const saved = await saveMyRequest(newReq);
+            await loadRequests();
+            closeRequestForm();
+            document.getElementById('requestsGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => {
+                const firstCard = document.querySelector('.request-card');
+                if (firstCard) {
+                    firstCard.style.outline = '3px solid #ffc107';
+                    firstCard.style.outlineOffset = '2px';
+                    setTimeout(() => firstCard.style.outline = '', 2000);
+                }
+            }, 300);
+            alert(`✅ Request submitted!\n${saved.id} — ${saved.title}\nCategory: ${category}\nService Types: ${types.join(', ')}\n\nAdmin dashboard will fetch it via GET /api/requests?role=complainant`);
+        });
     </script>
 </body>
 </html>

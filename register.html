@@ -52,10 +52,32 @@
             transition: border-color 0.3s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #ffc107;
             box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .role-hint {
+            color: #856404;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 8px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            line-height: 1.5;
         }
 
         .register-btn-submit {
@@ -129,13 +151,13 @@
             </div>
 
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                <label for="username">Username <small style="color:#666;font-weight:normal">(3-20 chars, a-z 0-9 . _ -)</small></label>
+                <input type="text" id="username" name="username" placeholder="johndoe" pattern="[a-zA-Z0-9._-]{3,20}" title="3-20 characters, letters, numbers, dot, underscore, dash">
             </div>
 
             <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="john@example.com" required>
             </div>
 
             <div class="form-group">
@@ -156,72 +178,71 @@
             </div>
         </form>
     </div>
-
     <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
     <script src="scripts/nav.js"></script>
     <script>
-        // Handle registration form submission
-        document.querySelector('.register-form').addEventListener('submit', function(e) {
+        // Handle registration via SQLite backend
+        document.querySelector('.register-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Get form values
             const fullname = document.getElementById('fullname').value.trim();
+            const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
 
-            // Validate passwords match
             if (password !== confirmPassword) {
                 alert('❌ Passwords do not match!');
                 return;
             }
-
-            // Validate password length
             if (password.length < 6) {
                 alert('❌ Password must be at least 6 characters long!');
                 return;
             }
 
-            // Check if user already exists
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            if (users.some(user => user.email === email)) {
-                alert('❌ This email is already registered!');
-                return;
+            const btn = document.querySelector('.register-btn-submit');
+            const orig = btn.textContent;
+            btn.textContent = 'Creating...';
+            btn.disabled = true;
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                const token = localStorage.getItem('facilix_token');
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const payload = { fullname, email, password };
+                if (username) payload.username = username;
+
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok || !data.ok) {
+                    alert('❌ ' + (data.error || 'Registration failed'));
+                    btn.textContent = orig;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Auto-login: backend returned token + user
+                if (data.token && data.user) {
+                    window.facilixAuth.setSession(data.token, data.user);
+                } else if (data.user) {
+                    // fallback: store safe user without token
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                }
+
+                alert(`✅ Registered as ${data.user.role}! Welcome, ${data.user.fullname}`);
+                setTimeout(() => { window.location.href = 'index.html'; }, 800);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Network error — is Deno server running on :8000?');
+                btn.textContent = orig;
+                btn.disabled = false;
             }
-
-            // Create new user object
-            const newUser = {
-                id: Date.now(),
-                fullname: fullname,
-                email: email,
-                phone: phone,
-                password: password,
-                registeredDate: new Date().toLocaleString()
-            };
-
-            // Save user to localStorage
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-
-            // Save login session to localStorage (auto-login after registration)
-            const loginSession = {
-                userId: newUser.id,
-                email: newUser.email,
-                fullname: newUser.fullname,
-                loginTime: new Date().toLocaleString(),
-                rememberMe: true
-            };
-
-            localStorage.setItem('currentUser', JSON.stringify(loginSession));
-
-            // Show success message
-            alert('✅ Registration successful! Welcome to FACILIX!');
-
-            // Redirect to home (which will show dashboard)
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
         });
     </script>
 </body>

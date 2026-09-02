@@ -569,7 +569,7 @@
                             </tr>
                             <tr>
                                 <td>#REQ-003</td>
-                                <td>Carpet Cleaning - Floor 3</td>
+                                <td>Hallway Deep Cleaning - Floor 3</td>
                                 <td>Cleaning</td>
                                 <td>2026-08-10</td>
                                 <td><span class="status-badge status-completed">Completed</span></td>
@@ -599,14 +599,22 @@
     </div>
 
     <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
     <script src="scripts/nav.js"></script>
     <script>
-        // Check if user is logged in
-        window.addEventListener('load', () => {
-            const user = getCurrentUser();
+        // Admin-only: only admin/superadmin can view all reports
+        window.addEventListener('load', async () => {
+            let user = getCurrentUser();
+            try { const me = await window.facilixAuth.fetchMe(); if (me) user = me; } catch {}
+            const allowed = ['superadmin','admin'];
             if (!user) {
-                alert('❌ Please login to access this page');
-                window.location.href = 'reports.html';
+                alert('❌ Please login to access reports');
+                window.location.href = 'login.html';
+                return;
+            }
+            if (!allowed.includes(user.role)) {
+                alert('⛔ Access denied — only admin/superadmin can view all reports. Your role: ' + user.role);
+                window.location.href = 'index.html';
                 return;
             }
             initializeCharts();

@@ -7,11 +7,16 @@
     <link rel="stylesheet" href="./css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Smart redirect: If user is logged in, show user reports dashboard
+        // Smart redirect: only admin/superadmin goes to dashboard; complainant stays on public reports
         window.addEventListener('load', () => {
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                window.location.href = 'reports-dashboard.html';
+            const raw = localStorage.getItem('currentUser');
+            if (raw) {
+                try {
+                    const u = JSON.parse(raw);
+                    if (u && (u.role === 'admin' || u.role === 'superadmin')) {
+                        window.location.href = 'reports-dashboard.html';
+                    }
+                } catch {}
             }
         });
     </script>
@@ -356,6 +361,7 @@
     </footer>
 
     <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
     <script src="scripts/nav.js"></script>
     <script>
         // Bar Chart

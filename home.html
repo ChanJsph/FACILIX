@@ -15,42 +15,46 @@
         .welcome-section {
             background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
             color: white;
-            padding: 50px 40px;
-            border-radius: 12px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 22px 24px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
         }
 
         .welcome-text h1 {
-            font-size: 36px;
-            margin: 0 0 15px 0;
-            font-weight: 700;
+            font-size: 22px;
+            margin: 0 0 6px 0;
+            font-weight: 800;
+            line-height: 1.2;
         }
 
         .welcome-text p {
-            font-size: 16px;
-            color: #ccc;
-            margin: 10px 0;
+            font-size: 12px;
+            color: #cbd5e1;
+            margin: 4px 0;
+            line-height: 1.4;
         }
 
         .welcome-actions {
             display: flex;
-            gap: 15px;
-            margin-top: 25px;
+            gap: 10px;
+            margin-top: 14px;
         }
 
         .btn-primary-home {
             background: #ffc107;
             color: #0f2a47;
             border: none;
-            padding: 12px 30px;
+            padding: 9px 18px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
         }
 
         .btn-primary-home:hover {
@@ -77,38 +81,41 @@
 
         .quick-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 14px 10px;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
             text-align: center;
-            border-left: 4px solid #ffc107;
-            transition: all 0.3s ease;
+            border-left: 3px solid #ffc107;
+            transition: all 0.2s ease;
         }
 
         .stat-card:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+            transform: translateY(-2px);
         }
 
         .stat-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: #ffc107;
-            margin-bottom: 8px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f2a47;
+            line-height: 1;
+            margin-bottom: 4px;
         }
 
         .stat-label {
-            font-size: 14px;
-            color: #999;
+            font-size: 10px;
+            color: #888;
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            line-height: 1.2;
         }
 
         .main-grid {
@@ -238,6 +245,39 @@
             font-weight: 700;
         }
 
+        .home-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-top: 24px;
+        }
+        .home-services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .home-service-card {
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 16px;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        .home-service-card:hover { border-color:#ffc107; background:white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .home-service-card h4 { margin:0 0 6px; color:#0f2a47; font-size:14px; font-weight:800; }
+        .home-service-card p { margin:0; color:#64748b; font-size:12px; line-height:1.5; }
+        .home-service-card .svc-icon { font-size:20px; margin-bottom:6px; }
+        .tech-row-home { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid #eef2f7; border-radius:8px; background:#f8fafc; margin-bottom:8px; }
+        .report-mini-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; }
+        .report-mini-card { background:#f8fafc; border:1px solid #eef2f7; border-radius:8px; padding:12px; text-align:center; }
+        .report-mini-card .num { font-size:18px; font-weight:800; color:#0f2a47; }
+        .report-mini-card .lbl { font-size:10px; color:#64748b; text-transform:uppercase; font-weight:700; }
+        .home-requests-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; }
+        .home-request-card { border:1px solid #eef2f7; border-radius:8px; padding:12px; background:#f8fafc; }
+        .home-request-card .req-title { font-weight:700; color:#0f2a47; font-size:13px; margin:0 0 4px; }
+        .home-request-card .req-meta { color:#64748b; font-size:11px; }
+
         .request-item {
             display: flex;
             justify-content: space-between;
@@ -279,15 +319,22 @@
             color: #0a3622;
         }
 
+        @media (max-width: 900px) {
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
         @media (max-width: 768px) {
             .welcome-section {
                 flex-direction: column;
                 text-align: center;
-                gap: 30px;
+                gap: 14px;
+                padding: 18px 16px;
             }
 
             .welcome-text h1 {
-                font-size: 28px;
+                font-size: 20px;
             }
 
             .welcome-actions {
@@ -304,7 +351,13 @@
             }
 
             .stat-card {
-                margin-bottom: 15px;
+                padding: 12px 8px;
+            }
+            .stat-number {
+                font-size: 20px;
+            }
+            .stat-label {
+                font-size: 9px;
             }
         }
     </style>
@@ -341,7 +394,6 @@
                 <p>Last login: <span id="loginTime">Just now</span></p>
                 <div class="welcome-actions">
                     <button class="btn-primary-home" onclick="navigateTo('requests.html')">View My Requests</button>
-                    <button class="btn-secondary-home" onclick="navigateTo('reports.html')">View Reports</button>
                 </div>
             </div>
         </div>
@@ -368,17 +420,13 @@
 
         <!-- Main Grid -->
         <div class="main-grid">
-            <!-- Quick Access -->
-            <div class="quick-access">
-                <h2>Quick Access</h2>
-                <div class="quick-links">
+            <!-- Quick Access — admin: Services/Reports/Requests/Technicians; user: My Requests/Services/New Request -->
+            <div class="quick-access" id="quickAccessCard">
+                <h2 id="quickAccessTitle">Quick Access</h2>
+                <div class="quick-links" id="quickLinksGrid">
                     <div class="quick-link" onclick="navigateTo('requests.html')">
                         <div class="quick-link-icon">📋</div>
                         <div class="quick-link-name">My Requests</div>
-                    </div>
-                    <div class="quick-link" onclick="navigateTo('reports.html')">
-                        <div class="quick-link-icon">📊</div>
-                        <div class="quick-link-name">Analytics</div>
                     </div>
                     <div class="quick-link" onclick="navigateTo('services.html')">
                         <div class="quick-link-icon">🔧</div>
@@ -434,23 +482,65 @@
                 <p style="color: #999;">Loading recent requests...</p>
             </div>
         </div>
+
+        <!-- Services — all 6 complaint categories (2-col) -->
+        <section class="home-section" id="homeServicesSection">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+                <h2 style="margin:0;color:#0f2a47;font-size:20px;font-weight:800;">🔧 Services</h2>
+                <a href="services.html" style="color:#0f2a47;font-weight:700;font-size:13px;text-decoration:none;">View all →</a>
+            </div>
+            <div class="home-services-grid" id="homeServicesGrid"></div>
+        </section>
+
+        <!-- Technicians — admin only list -->
+        <section class="home-section" id="homeTechniciansSection">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+                <h2 style="margin:0;color:#0f2a47;font-size:20px;font-weight:800;">👷 Technicians</h2>
+                <a href="technicians.html" id="homeTechManageLink" style="color:#0f2a47;font-weight:700;font-size:13px;text-decoration:none;display:none;">Manage →</a>
+            </div>
+            <div id="homeTechniciansList"></div>
+        </section>
+
+        <!-- Reports — admin only (summary) -->
+        <section class="home-section" id="homeReportsSection">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+                <h2 style="margin:0;color:#0f2a47;font-size:20px;font-weight:800;">📊 Reports</h2>
+                <a href="reports.html" id="homeReportsLink" style="color:#0f2a47;font-weight:700;font-size:13px;text-decoration:none;">View reports →</a>
+            </div>
+            <div id="homeReportsContent"></div>
+        </section>
+
+        <!-- Requests — all / my (role-aware) -->
+        <section class="home-section" id="homeRequestsSection">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+                <h2 style="margin:0;color:#0f2a47;font-size:20px;font-weight:800;">📋 Requests</h2>
+                <a href="requests.html" style="color:#0f2a47;font-weight:700;font-size:13px;text-decoration:none;">Open requests →</a>
+            </div>
+            <div id="homeRequestsGrid"></div>
+        </section>
     </div>
 
     <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
     <script src="scripts/nav.js"></script>
     <script>
         // Mock requests data
         const mockRequests = [
             { id: 'REQ-001', title: 'HVAC System Maintenance', status: 'in-progress' },
             { id: 'REQ-002', title: 'Conference Room Lighting', status: 'pending' },
-            { id: 'REQ-003', title: 'Carpet Cleaning - Floor 3', status: 'completed' },
+            { id: 'REQ-003', title: 'Hallway Deep Cleaning - Floor 3', status: 'completed' },
             { id: 'REQ-004', title: 'Security System Update', status: 'pending' },
             { id: 'REQ-005', title: 'Plumbing Inspection', status: 'in-progress' }
         ];
 
         // Check if user is logged in
-        window.addEventListener('load', () => {
-            const user = getCurrentUser();
+        window.addEventListener('load', async () => {
+            let user = getCurrentUser();
+            // Verify with server (SQLite) — if token invalid, fetchMe clears session
+            try { const me = await window.facilixAuth.fetchMe(); if (me) user = me; } catch {}
+            // Role check: allow all authenticated roles on this page (customize per page if needed)
+            const allowed = ['superadmin','admin','technician','complainant'];
+            if (user && !allowed.includes(user.role)) { alert('⛔ Role ' + user.role + ' not allowed here'); window.location.href='index.html'; return; }
             if (!user) {
                 alert('❌ Please login to access this page');
                 window.location.href = 'login.html';
@@ -462,11 +552,39 @@
             document.getElementById('userEmail').textContent = user.email;
             document.getElementById('loginTime').textContent = user.loginTime;
 
+            // Admin: quick access holds Services/Reports/Requests/Technicians, hide them at top nav and tiled sections
+            const isAdmin = user.role === 'admin' || user.role === 'superadmin';
+            const quickGrid = document.getElementById('quickLinksGrid');
+            const quickTitle = document.getElementById('quickAccessTitle');
+            if (isAdmin && quickGrid) {
+                quickGrid.innerHTML = `
+                    <div class="quick-link" onclick="navigateTo('services.html')"><div class="quick-link-icon">🔧</div><div class="quick-link-name">Services</div></div>
+                    <div class="quick-link" onclick="navigateTo('reports.html')"><div class="quick-link-icon">📊</div><div class="quick-link-name">Reports</div></div>
+                    <div class="quick-link" onclick="navigateTo('requests.html')"><div class="quick-link-icon">📋</div><div class="quick-link-name">Requests</div></div>
+                    <div class="quick-link" onclick="navigateTo('technicians.html')"><div class="quick-link-icon">👷</div><div class="quick-link-name">Technicians</div></div>
+                `;
+                if (quickTitle) quickTitle.textContent = 'Admin Quick Access';
+                // Hide the tiled Services/Technicians/Reports/Requests at top (now in quick access)
+                ['homeServicesSection','homeTechniciansSection','homeReportsSection','homeRequestsSection'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+            }
+
             // Load stats
             loadStats();
-            
-            // Load recent requests
             loadRecentRequests();
+            if (!isAdmin) {
+                loadHomeServices();
+                loadHomeTechnicians();
+                loadHomeReports();
+                loadHomeRequests();
+            } else {
+                // Admin still loads technicians/reports/requests for quick access counts, but tiled sections hidden
+                loadHomeTechnicians();
+                loadHomeReports();
+                // Services tiled hidden, but quick access already covers
+            }
         });
 
         // Load statistics
@@ -497,14 +615,122 @@
             document.getElementById('recentRequestsList').innerHTML = html || '<p style="color: #999;">No recent requests</p>';
         }
 
+        // Home: Services — 6 complaint categories 2-col
+        function loadHomeServices() {
+            const cats = [
+                { icon:'🧯', name:'Fire Protection / DAS', desc:'Fire alarms, DAS, sprinklers' },
+                { icon:'🏗️', name:'Physical Structures', desc:'Walls, floors, doors' },
+                { icon:'⚡', name:'Electrical', desc:'Lighting, panels, wiring' },
+                { icon:'⚙️', name:'Mechanical', desc:'Elevators, pumps, generators' },
+                { icon:'🚿', name:'Water / Sanitary / Fixtures', desc:'Leaks, fixtures, drainage' },
+                { icon:'❄️', name:'Air Conditioning', desc:'AC, HVAC, ventilation' },
+            ];
+            const grid = document.getElementById('homeServicesGrid');
+            if (!grid) return;
+            grid.innerHTML = cats.map(c => `
+                <div class="home-service-card">
+                    <div class="svc-icon">${c.icon}</div>
+                    <h4>${c.name}</h4>
+                    <p>${c.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        // Home: Technicians — admin sees all, user sees limited
+        async function loadHomeTechnicians() {
+            const listEl = document.getElementById('homeTechniciansList');
+            const manageLink = document.getElementById('homeTechManageLink');
+            if (!listEl) return;
+            const user = getCurrentUser();
+            const isAdmin = user && (user.role === 'admin' || user.role === 'superadmin');
+            if (manageLink) manageLink.style.display = isAdmin ? '' : 'none';
+            if (!isAdmin) {
+                listEl.innerHTML = `<div style="text-align:center;padding:16px;color:#64748b;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:8px;">🔒 Technicians — admin only. Your role: <strong>${user?.role || 'guest'}</strong></div>`;
+                return;
+            }
+            // Admin: fetch from server + local
+            let serverTechs = [];
+            const token = localStorage.getItem('facilix_token');
+            try {
+                const res = await fetch('/api/auth/users', { headers: token ? { 'Authorization':'Bearer '+token } : {} });
+                const data = await res.json();
+                if (data.ok) serverTechs = data.users.filter(u => u.role === 'technician');
+            } catch {}
+            let localTechs = [];
+            try { localTechs = JSON.parse(localStorage.getItem('facilix_technicians_local') || '[]'); } catch {}
+            const all = [...serverTechs.map(u => ({ name: u.fullname, sub: u.email })), ...localTechs.map(x => ({ name: x.name, sub: 'Local' }))];
+            if (all.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center;padding:16px;color:#999;">No technicians yet. <a href="technicians.html">Add →</a></div>`;
+                return;
+            }
+            listEl.innerHTML = all.slice(0,6).map(t => `
+                <div class="tech-row-home">
+                    <span style="font-weight:700;color:#0f2a47;font-size:13px;">${t.name}</span>
+                    <span style="color:#64748b;font-size:11px;">${t.sub}</span>
+                </div>
+            `).join('') + (all.length>6 ? `<div style="text-align:center;margin-top:8px;"><a href="technicians.html" style="font-size:12px;color:#0f2a47;font-weight:700;">View all ${all.length} →</a></div>` : '');
+        }
+
+        // Home: Reports — mini stats (admin sees numbers, user sees limited)
+        function loadHomeReports() {
+            const el = document.getElementById('homeReportsContent');
+            if (!el) return;
+            const user = getCurrentUser();
+            const isAdmin = user && (user.role === 'admin' || user.role === 'superadmin');
+            if (!isAdmin) {
+                el.innerHTML = `<div style="text-align:center;padding:16px;color:#64748b;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:8px;">🔒 Reports — admin only. Your role: <strong>${user?.role || 'guest'}</strong> — <a href="reports.html">View public reports</a></div>`;
+                return;
+            }
+            el.innerHTML = `
+                <div class="report-mini-grid">
+                    <div class="report-mini-card"><div class="num">312</div><div class="lbl">Completed</div></div>
+                    <div class="report-mini-card"><div class="num">28</div><div class="lbl">Pending</div></div>
+                    <div class="report-mini-card"><div class="num">7</div><div class="lbl">Critical</div></div>
+                    <div class="report-mini-card"><div class="num">94%</div><div class="lbl">Efficiency</div></div>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px;">
+                    <a href="reports.html" style="flex:1;text-align:center;background:#0f2a47;color:white;padding:10px;border-radius:6px;text-decoration:none;font-weight:700;font-size:13px;">View Reports</a>
+                    <a href="reports-dashboard.html" style="flex:1;text-align:center;background:#ffc107;color:#0f2a47;padding:10px;border-radius:6px;text-decoration:none;font-weight:700;font-size:13px;">Dashboard</a>
+                </div>`;
+        }
+
+        // Home: Requests — per-user (complainant sees own, admin sees all)
+        function loadHomeRequests() {
+            const grid = document.getElementById('homeRequestsGrid');
+            if (!grid) return;
+            const user = getCurrentUser();
+            const isAdmin = user && (user.role === 'admin' || user.role === 'superadmin');
+            // reuse per-user logic from requests.html if available
+            let visible = [];
+            try {
+                const key = 'facilix_requests_' + ((user?.email || user?.username || '').toLowerCase());
+                const my = JSON.parse(localStorage.getItem(key) || '[]');
+                const allGlobal = JSON.parse(localStorage.getItem('facilix_all_user_requests') || '[]');
+                visible = isAdmin ? [...allGlobal, ...mockRequests] : my;
+            } catch {
+                visible = isAdmin ? mockRequests : [];
+            }
+            if (visible.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:#999;background:#f8fafc;border-radius:8px;">No requests yet. <a href="requests.html?new=1" style="color:#0f2a47;font-weight:700;">Create one →</a></div>`;
+                return;
+            }
+            grid.innerHTML = visible.slice(0,4).map(r => `
+                <div class="home-request-card">
+                    <div class="req-title">${r.id} — ${r.title}</div>
+                    <div class="req-meta">${r.category || r.type || ''} • ${r.status} • ${r.priority || ''}</div>
+                    <div style="color:#64748b;font-size:11px;margin-top:4px;">${r.description ? r.description.slice(0,60) : ''}...</div>
+                </div>
+            `).join('');
+        }
+
         // Navigate function
         function navigateTo(page) {
             window.location.href = page;
         }
 
-        // Create new request
+        // Create new request — redirect to request form
         function createNewRequest() {
-            alert('📝 Create Request feature coming soon!');
+            window.location.href = 'requests.html?new=1';
         }
     </script>
 </body>

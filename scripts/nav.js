@@ -7,14 +7,41 @@
  * - Works for both legacy headers: .header-container and inline .container
  */
 (function () {
-  // Canonical site-wide nav — same 5 links on every page, order: Home, Services, Reports, Requests, About
+  // Admin: quick-access holds Services/Reports/Requests/Technicians, so hide them at top for admin
   const NAV_LINKS = [
-    { href: "index.html", label: "Home", test: (p) => p === "index.html" || p === "" || p === "home.html" },
-    { href: "services.html", label: "Services", test: (p) => p === "services.html" || p === "services-dashboard.html" },
-    { href: "reports.html", label: "Reports", test: (p) => p === "reports.html" || p === "reports-dashboard.html" },
-    { href: "requests.html", label: "Requests", test: (p) => p === "requests.html" },
-    { href: "about.html", label: "About", test: (p) => p === "about.html" || p === "about-dashboard.html" },
+    { href: "index.html", label: "Home", test: (p) => p === "index.html" || p === "" || p === "home.html", roles: ["complainant","technician","admin","superadmin", null] },
+    { href: "services.html", label: "Services", test: (p) => p === "services.html" || p === "services-dashboard.html", roles: ["complainant","technician", null] },
+    { href: "reports.html", label: "Reports", test: (p) => p === "reports.html" || p === "reports-dashboard.html", roles: [] },
+    { href: "requests.html", label: "Requests", test: (p) => p === "requests.html", roles: [] },
+    { href: "technicians.html", label: "Technicians", test: (p) => p === "technicians.html", roles: [] },
+    { href: "about.html", label: "About", test: (p) => p === "about.html" || p === "about-dashboard.html", roles: ["complainant","technician","admin","superadmin", null] },
   ];
+
+  function getCurrentRole() {
+    try {
+      // auth.js stores token+user; try facilixAuth first, fallback to localStorage
+      if (window.facilixAuth && window.facilixAuth.getRole) return window.facilixAuth.getRole();
+      const raw = localStorage.getItem("currentUser") || localStorage.getItem("facilix_token") && localStorage.getItem("currentUser");
+      if (raw) {
+        const u = JSON.parse(localStorage.getItem("currentUser") || "null");
+        return u?.role || null;
+      }
+      // also check stored safe user under facilix key
+      const u2 = JSON.parse(localStorage.getItem("currentUser") || "null");
+      if (u2?.role) return u2.role;
+    } catch {}
+    // try direct token decode? just check localStorage for role
+    try {
+      const u = JSON.parse(localStorage.getItem("currentUser") || "null");
+      if (u?.role) return u.role;
+    } catch {}
+    return null; // public / not logged in
+  }
+
+  function visibleLinks() {
+    const role = getCurrentRole();
+    return NAV_LINKS.filter(l => !l.roles || l.roles.includes(role));
+  }
 
   function getCurrentPage() {
     const path = window.location.pathname;
@@ -52,17 +79,15 @@
     let navbar = container.querySelector(".navbar");
     let authButtons = container.querySelector(".auth-buttons");
 
-    // Rebuild navbar site-wide from canonical NAV_LINKS so every page has identical, correct hrefs/order.
-    // Fixes stale/per-page drift, wrong order, missing links, and typos.
+    // Rebuild navbar site-wide from canonical NAV_LINKS filtered by role
     if (navbar) {
       const cur = getCurrentPage();
       navbar.innerHTML = "";
-      NAV_LINKS.forEach((link) => {
+      visibleLinks().forEach((link) => {
         const a = document.createElement("a");
         a.href = link.href;
         a.textContent = link.label;
         a.className = "nav-link";
-        // active if exact or via test (e.g. services-dashboard → Services)
         const isActive = link.test ? link.test(cur) : link.href === cur;
         if (isActive) {
           a.classList.add("active");
@@ -72,48 +97,131 @@
       });
     }
 
-    // Ensure auth buttons exist site-wide
+    // Ensure auth buttons exist site-wide — when logged in, replace login/register with logout icon at same location
+    const isLoggedIn = !!getCurrentRole();
     if (!authButtons) {
       authButtons = document.createElement("div");
       authButtons.className = "auth-buttons";
       authButtons.innerHTML = '<a href="register.html" class="register-btn">Register</a><a href="login.html" class="login-btn">Login</a>';
-    } else {
-      // normalize hrefs/text in case of drift
-      authButtons.querySelectorAll("a").forEach((a) => {
-        const href = a.getAttribute("href") || "";
-        if (href.includes("register")) { a.href = "register.html"; a.textContent = "Register"; a.className = "register-btn"; }
-        if (href.includes("login")) { a.href = "login.html"; a.textContent = "Login"; a.className = "login-btn"; }
-      });
-      // ensure both buttons present
-      if (!authButtons.querySelector('a[href="register.html"]')) {
-        const r = document.createElement("a");
-        r.href = "register.html"; r.className = "register-btn"; r.textContent = "Register";
-        authButtons.prepend(r);
-      }
-      if (!authButtons.querySelector('a[href="login.html"]')) {
-        const l = document.createElement("a");
-        l.href = "login.html"; l.className = "login-btn"; l.textContent = "Login";
-        authButtons.appendChild(l);
-      }
     }
 
-    // wrap navbar + auth into .nav-menu if not already
+    // Remove any legacy separate user-menu (we now reuse auth-buttons at login location)
+    const legacyMenu = container.querySelector(".user-menu");
+    if (legacyMenu) legacyMenu.remove();
+
+    if (isLoggedIn) {
+      try {
+        const raw = localStorage.getItem("currentUser");
+        const u = raw ? JSON.parse(raw) : null;
+        const name = u?.fullname || u?.username || u?.email || "User";
+        const email = u?.email || "";
+        const role = u?.role || getCurrentRole() || "";
+        const initial = (name.trim()[0] || "U").toUpperCase();
+        const loginTime = (() => { try { return u?.loginTime || ""; } catch { return ""; } })() || new Date().toLocaleString();
+        const shortName = name.split(" ")[0] || name;
+        // Compact pill in nav bar — details only in dropdown
+        authButtons.innerHTML = `
+          <button class="user-pill" id="navUserPill" aria-expanded="false" aria-haspopup="true" aria-controls="userDropdown" title="${name} — ${email}">
+            <span class="user-avatar">${initial}</span>
+            <span class="user-name">${shortName}</span>
+            <svg class="user-pill-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="navUserPill">
+            <div class="dropdown-header">
+              <span class="dropdown-avatar">${initial}</span>
+              <div style="min-width:0; flex:1;">
+                <div class="dropdown-name">${name}</div>
+                <div class="dropdown-email">${email}</div>
+                <span class="dropdown-role">${role}</span>
+              </div>
+            </div>
+            <div class="dropdown-meta">
+              <div class="dropdown-meta-row"><strong>Email</strong><span title="${email}">${email}</span></div>
+              <div class="dropdown-meta-row"><strong>Role</strong><span style="text-transform:capitalize">${role}</span></div>
+              <div class="dropdown-meta-row"><strong>Login</strong><span>${loginTime}</span></div>
+              <div class="dropdown-status">● Active session</div>
+            </div>
+            <div class="dropdown-actions">
+              <button class="dropdown-logout" onclick="window.facilixAuth && window.facilixAuth.logout()" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>`;
+        authButtons.style.display = "";
+        authButtons.classList.add("auth-logged-in");
+        // bind dropdown toggle
+        setTimeout(() => {
+          const pill = document.getElementById("navUserPill");
+          const dropdown = document.getElementById("userDropdown");
+          if (!pill || !dropdown) return;
+          function open() {
+            pill.setAttribute("aria-expanded", "true");
+            dropdown.classList.add("active");
+          }
+          function close() {
+            pill.setAttribute("aria-expanded", "false");
+            dropdown.classList.remove("active");
+          }
+          function isOpen() { return pill.getAttribute("aria-expanded") === "true"; }
+          pill.addEventListener("click", (e) => {
+            e.stopPropagation();
+            isOpen() ? close() : open();
+          });
+          document.addEventListener("click", (e) => {
+            if (!isOpen()) return;
+            if (!dropdown.contains(e.target) && !pill.contains(e.target)) close();
+          });
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && isOpen()) close();
+          });
+          // prevent dropdown clicks from closing nav-menu on mobile
+          dropdown.addEventListener("click", (e) => e.stopPropagation());
+        }, 0);
+      } catch {
+        authButtons.innerHTML = '<a href="register.html" class="register-btn">Register</a><a href="login.html" class="login-btn">Login</a>';
+      }
+    } else {
+      // Public / not logged in — restore Register + Login at same spot
+      authButtons.innerHTML = '<a href="register.html" class="register-btn">Register</a><a href="login.html" class="login-btn">Login</a>';
+      authButtons.style.display = "";
+      authButtons.classList.remove("auth-logged-in");
+    }
+
+    // wrap navbar into .nav-menu; keep auth (user pill) OUTSIDE as compact pill next to logo
     let navMenu = container.querySelector(".nav-menu");
     if (!navMenu) {
       navMenu = document.createElement("div");
       navMenu.className = "nav-menu";
       navMenu.id = "nav-menu";
-      // move navbar + auth into menu
       if (navbar) navMenu.appendChild(navbar);
-      if (authButtons) navMenu.appendChild(authButtons);
       container.appendChild(navMenu);
     } else {
-      // ensure navbar/auth are inside menu
       if (navbar && navbar.parentElement !== navMenu) navMenu.insertBefore(navbar, navMenu.firstChild);
-      if (authButtons && authButtons.parentElement !== navMenu) navMenu.appendChild(authButtons);
+      // if auth was previously inside menu, move it out
+      if (authButtons && authButtons.parentElement === navMenu) {
+        container.appendChild(authButtons);
+      }
+    }
+    // ensure authButtons is direct child of header container (outside drawer) — pill next to logo
+    if (authButtons && authButtons.parentElement !== container) {
+      // place after navMenu (flex: logo | navMenu(fixed on mobile) | auth pill | toggle)
+      const t = container.querySelector(".nav-toggle");
+      if (t) container.insertBefore(authButtons, t);
+      else container.appendChild(authButtons);
+    }
+    // if authButtons somehow still inside navMenu, pull it out
+    if (authButtons && authButtons.parentElement === navMenu) {
+      container.appendChild(authButtons);
     }
 
-    // ensure toggle button exists
+    // ensure toggle button exists — placed AFTER auth pill (rightmost)
     let toggle = container.querySelector(".nav-toggle");
     if (!toggle) {
       toggle = document.createElement("button");
@@ -123,8 +231,18 @@
       toggle.setAttribute("aria-expanded", "false");
       toggle.setAttribute("aria-controls", "nav-menu");
       toggle.innerHTML = "<span></span><span></span><span></span>";
-      // insert before nav-menu
-      container.insertBefore(toggle, navMenu);
+      container.appendChild(toggle);
+    } else {
+      // ensure toggle is after auth pill
+      if (authButtons && toggle.previousElementSibling !== authButtons && authButtons.parentElement === container) {
+        container.insertBefore(authButtons, toggle);
+      }
+      // ensure toggle is last visual (flex order handled via CSS order, but keep DOM last)
+      if (container.lastElementChild !== toggle) {
+        container.appendChild(toggle);
+        // re-insert auth before toggle
+        if (authButtons) container.insertBefore(authButtons, toggle);
+      }
     }
 
     // ensure overlay exists (outside header, direct child of body)
