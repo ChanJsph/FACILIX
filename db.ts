@@ -104,6 +104,28 @@ db.exec(`
   END;
 `);
 
+// Migration: add admin confirmation columns if missing (confirmed, confirmed_by, confirmed_at)
+try {
+  const rcols = db.prepare("PRAGMA table_info(requests)").all() as { name: string }[];
+  const hasConfirmed = rcols.some((c) => c.name === "confirmed");
+  const hasConfirmedBy = rcols.some((c) => c.name === "confirmed_by");
+  const hasConfirmedAt = rcols.some((c) => c.name === "confirmed_at");
+  if (!hasConfirmed) {
+    db.exec("ALTER TABLE requests ADD COLUMN confirmed INTEGER NOT NULL DEFAULT 0;");
+    console.log("  🔧 migrated: added requests.confirmed");
+  }
+  if (!hasConfirmedBy) {
+    db.exec("ALTER TABLE requests ADD COLUMN confirmed_by TEXT;");
+    console.log("  🔧 migrated: added requests.confirmed_by");
+  }
+  if (!hasConfirmedAt) {
+    db.exec("ALTER TABLE requests ADD COLUMN confirmed_at TEXT;");
+    console.log("  🔧 migrated: added requests.confirmed_at");
+  }
+} catch (e) {
+  console.warn("  ⚠️ requests confirmation migration failed", e);
+}
+
 // Seed helpers
 function userExists(email: string): boolean {
   const row = db.prepare("SELECT 1 FROM users WHERE email = ? COLLATE NOCASE").get(email.toLowerCase());
@@ -240,6 +262,9 @@ export type RequestRow = {
   owner_id: number | null;
   owner_email: string;
   owner_name: string | null;
+  confirmed: number; // 0/1 — admin confirmation of work
+  confirmed_by: string | null;
+  confirmed_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -262,6 +287,9 @@ export function toFrontendRequest(r: RequestRow & { owner_role?: string; owner_f
     owner: r.owner_email,
     ownerName: r.owner_name ?? r.owner_fullname ?? r.owner_email,
     owner_role: (r as unknown as { owner_role?: string }).owner_role ?? null,
+    confirmed: !!(r.confirmed ?? 0),
+    confirmedBy: r.confirmed_by ?? null,
+    confirmedAt: r.confirmed_at ?? null,
   };
 }
 

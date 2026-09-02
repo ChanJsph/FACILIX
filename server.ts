@@ -385,6 +385,7 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
 
     const body = await req.json().catch(() => null) as {
       priority?: string; assignedTo?: string; status?: string; title?: string; description?: string; location?: string; category?: string; type?: string;
+      confirmed?: boolean;
     } | null;
     if (!body) return json({ ok: false, error: "invalid json" }, 400, req);
 
@@ -398,6 +399,19 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
     if (body.assignedTo !== undefined) {
       if (!isAdmin) return json({ ok: false, error: "only admin can assign technician" }, 403, req);
       updates["assigned_to"] = body.assignedTo;
+    }
+    // ADMIN confirmation of work — admin only, stamps confirmed_by/at
+    if (body.confirmed !== undefined) {
+      if (!isAdmin) return json({ ok: false, error: "only admin can confirm work" }, 403, req);
+      if (body.confirmed) {
+        updates["confirmed"] = 1;
+        updates["confirmed_by"] = user.email;
+        updates["confirmed_at"] = new Date().toISOString();
+      } else {
+        updates["confirmed"] = 0;
+        updates["confirmed_by"] = null;
+        updates["confirmed_at"] = null;
+      }
     }
     // owner-editable before assignment (admin can also edit)
     if (isOwner || isAdmin) {

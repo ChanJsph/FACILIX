@@ -873,6 +873,12 @@
                             <div style="font-size:13px;color:#92400e;font-weight:700;margin-bottom:8px;">⏳ This request is pending — confirm to accept?</div>
                             <button type="button" id="confirmPendingBtn" class="btn-submit-request" style="width:100%;background:#059669;" onclick="confirmPending()">✅ Confirm & Accept (set to In Progress)</button>
                         </div>
+                        <!-- ADMIN confirmation of work -->
+                        <div id="confirmWorkWrap" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px;margin-top:10px;">
+                            <div id="confirmWorkState" style="font-size:12px;color:#166534;font-weight:700;margin-bottom:8px;"></div>
+                            <button type="button" id="confirmWorkBtn" class="btn-submit-request" style="width:100%;background:#16a34a;" onclick="confirmWork()">✓ Confirm Work — Verified by Admin</button>
+                            <button type="button" id="unconfirmWorkBtn" class="btn-cancel-request" style="width:100%;margin-top:8px;display:none;background:white;color:#166534;border-color:#86efac;" onclick="unconfirmWork()">↩ Revoke Confirmation</button>
+                        </div>
                         <button type="button" class="btn-cancel-request" style="width:100%;margin-top:10px;color:#842029;border-color:#f8d7da;background:#fee2e2;" onclick="cancelRequestFromEdit()">🗑️ Cancel Request (Reject)</button>
                         <div class="form-actions" style="margin-top:14px;">
                             <button type="button" class="btn-cancel-request" onclick="closeEdit()">Close</button>
@@ -1207,7 +1213,7 @@
                 const serverData = complainantOnlyMode ? await fetchComplainantRequests() : await fetchRequestsFromServer();
                 if (!serverData) {
                     const vis = getVisibleRequests();
-                    const sig = vis.map(r => r.id + '|' + r.status + '|' + r.priority + '|' + r.assignedTo + '|' + (r.owner||'')).join(';');
+                    const sig = vis.map(r => r.id + '|' + r.status + '|' + r.priority + '|' + r.assignedTo + '|' + (r.owner||'') + '|' + (r.confirmed?1:0)).join(';');
                     if (sig !== _lastAdminSig) {
                         _lastAdminSig = sig;
                         if (currentFilter === 'all') renderRequests(vis);
@@ -1215,7 +1221,7 @@
                     }
                     return;
                 }
-                const sig2 = serverData.map(r => r.id + '|' + r.status + '|' + r.priority + '|' + r.assignedTo + '|' + (r.owner||'')).join(';');
+                const sig2 = serverData.map(r => r.id + '|' + r.status + '|' + r.priority + '|' + r.assignedTo + '|' + (r.owner||'') + '|' + (r.confirmed?1:0)).join(';');
                 if (sig2 !== _lastAdminSig) {
                     _lastAdminSig = sig2;
                     serverRequestsCache = serverData;
@@ -1325,14 +1331,19 @@
                 const complainantPill = isAdmin
                     ? `<span class="req-complainant" title="${escapeHtml(owner)}"><span class="req-avatar">${escapeHtml(avatarLetter)}</span><span style="overflow:hidden;text-overflow:ellipsis;">${escapeHtml(ownerShort)}</span></span>`
                     : ``;
+                const isConfirmed = !!request.confirmed;
+                const confirmedBy = request.confirmedBy || request.confirmed_by || '';
+                const confirmedAt = request.confirmedAt || request.confirmed_at || '';
+                const confirmedBadge = isConfirmed ? `<span class="req-confirmed" title="Confirmed by ${escapeHtml(confirmedBy)}${confirmedAt ? ' on ' + escapeHtml(new Date(confirmedAt).toLocaleDateString()) : ''}" style="font-size:10px;font-weight:800;color:#166534;background:#f0fdf4;border:1px solid #86efac;padding:4px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0;">✓ Confirmed</span>` : ``;
                 const row = document.createElement('div');
                 row.className = 'req-row';
                 row.id = 'req-row-' + request.id;
+                if (isConfirmed) row.style.borderColor = '#86efac';
                 row.innerHTML = `
                     <div class="req-row-header" onclick="toggleReqRow('${request.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReqRow('${request.id}')}" aria-expanded="false">
                         <span class="req-dot ${dotClass}" aria-hidden="true"></span>
                         <div class="req-main">
-                            <div class="req-title">${escapeHtml(request.title)}</div>
+                            <div class="req-title">${escapeHtml(request.title)}${isConfirmed ? ' <span style="color:#16a34a;font-size:11px;">✓</span>' : ''}</div>
                             <div class="req-sub">
                                 <span class="req-id">${escapeHtml(request.id)}</span>
                                 ${cat ? `<span class="sep">•</span><span>${escapeHtml(cat)}</span>` : ``}
@@ -1341,6 +1352,7 @@
                             </div>
                         </div>
                         ${complainantPill}
+                        ${confirmedBadge}
                         <span class="req-priority ${escapeHtml(prio)}">${escapeHtml(prio)}</span>
                         <span class="req-chevron" aria-hidden="true">⌄</span>
                     </div>
@@ -1353,10 +1365,12 @@
                                 <div class="req-meta-box"><strong>Assigned</strong><span>${escapeHtml(request.assignedTo || 'Pending Assignment')}</span></div>
                                 <div class="req-meta-box"><strong>Created</strong><span>${escapeHtml(request.createdDate || due || '-')}</span></div>
                             </div>
+                            ${isConfirmed ? `<div style="font-size:12px;color:#166534;background:#f0fdf4;border:1px solid #86efac;padding:8px 10px;border-radius:8px;display:flex;align-items:center;gap:6px;"><span>✓</span><span><strong>Confirmed by admin</strong>${confirmedBy ? ` — ${escapeHtml(confirmedBy)}` : ''}${confirmedAt ? ` on ${escapeHtml(new Date(confirmedAt).toLocaleDateString())} ${escapeHtml(new Date(confirmedAt).toLocaleTimeString())}` : ''} — work verified</span></div>` : (isAdmin ? `<div style="font-size:11px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;padding:6px 10px;border-radius:8px;">⏳ Not yet confirmed by admin — verify and confirm work when completed.</div>` : ``)}
                             ${isAdmin ? `<div style="font-size:11px;color:#64748b;background:#fffbeb;border:1px solid #fde68a;padding:6px 10px;border-radius:8px;">👤 ${escapeHtml(owner)}${request.status ? ` • ${escapeHtml(request.status)}` : ''}</div>` : ``}
                             <div class="req-actions">
                                 <button class="btn-view" onclick="event.stopPropagation(); viewRequest('${request.id}')">View Details</button>
                                 ${isAdmin ? `<button class="btn-edit" onclick="event.stopPropagation(); editRequest('${request.id}')">Edit</button>` : ``}
+                                ${isAdmin && !isConfirmed ? `<button class="btn-view" style="background:#16a34a;" onclick="event.stopPropagation(); quickConfirm('${request.id}')">✓ Confirm</button>` : ``}
                             </div>
                         </div>
                     </div>
@@ -1387,7 +1401,11 @@
             const statusClass = `status-${request.status.replace(' ', '-')}`;
             const body = document.getElementById('requestDetailsBody');
             const sub = document.getElementById('detailsSubtitle');
-            if (sub) sub.textContent = `${request.id} — ${request.status.replace('-',' ')} • ${request.category || request.type || ''}`;
+            if (sub) sub.textContent = `${request.id} — ${request.status.replace('-',' ')}${request.confirmed ? ' ✓ Confirmed' : ''} • ${request.category || request.type || ''}`;
+            const isConfirmedView = !!request.confirmed;
+            const confirmedByView = request.confirmedBy || request['confirmed_by'] || '';
+            const confirmedAtView = request.confirmedAt || request['confirmed_at'] || '';
+            const confirmedAtStr = confirmedAtView ? new Date(confirmedAtView).toLocaleString() : '';
             body.innerHTML = `
                 <div style="display:grid;gap:14px;">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
@@ -1435,7 +1453,8 @@
                         <div style="font-size:13px;color:#334155;line-height:1.6;white-space:pre-wrap;">${request.description || '-'}</div>
                     </div>
 
-                    ${isAdmin ? `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;color:#92400e;font-size:12px;">🔒 Admin view: you see who sent this request (${owner}). Only admin can change/pause/cancel.</div>` : ''}
+                    ${isConfirmedView ? `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 12px;color:#166534;font-size:12px;display:flex;gap:8px;align-items:center;"><span style="font-size:14px;">✓</span><span><strong>Confirmed by admin</strong>${confirmedByView ? ` — ${confirmedByView}` : ''}${confirmedAtStr ? ` on ${confirmedAtStr}` : ''} — work verified and completed.</span></div>` : (isAdmin ? `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;color:#92400e;font-size:12px;">⏳ Not yet confirmed — admin can confirm work in Edit → Confirm Work.</div>` : `<div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:10px 12px;color:#64748b;font-size:12px;">⏳ Awaiting admin confirmation — work not yet verified.</div>`)}
+                    ${isAdmin ? `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;color:#92400e;font-size:12px;">🔒 Admin view: you see who sent this request (${owner}). Only admin can change/pause/cancel and confirm work.</div>` : ''}
 
                     <div style="display:flex;gap:10px;margin-top:4px;">
                         <button class="btn-cancel-request" style="${isAdmin ? 'flex:1;' : 'width:100%;'}" onclick="closeDetails()">Close</button>
@@ -1462,14 +1481,27 @@
             } catch {}
         }
         async function findAndUpdateRequest(requestId, updates) {
+            // Enrich admin confirmation locally for offline preview (server will stamp officially)
+            if (updates.confirmed === true && !updates.confirmedBy) {
+                try { updates.confirmedBy = (getCurrentUser()?.email || getCurrentUserKey()); } catch {}
+                updates.confirmedAt = new Date().toISOString();
+            }
+            if (updates.confirmed === false) {
+                updates.confirmedBy = null; updates.confirmedAt = null;
+                updates.confirmed_by = null; updates.confirmed_at = null;
+            }
             // Try server first (admin updating complainant requests)
             try {
                 const token = localStorage.getItem('facilix_token');
                 if (token) {
+                    // normalize for server (snake_case fallback handled by server, but send both)
+                    const serverUpdates = { ...updates };
+                    if (serverUpdates.confirmedBy) serverUpdates.confirmed_by = serverUpdates.confirmedBy;
+                    if (serverUpdates.confirmedAt) serverUpdates.confirmed_at = serverUpdates.confirmedAt;
                     const res = await fetch('/api/requests/' + encodeURIComponent(requestId), {
                         method: 'PUT',
                         headers: getAuthHeaders(),
-                        body: JSON.stringify(updates)
+                        body: JSON.stringify(serverUpdates)
                     });
                     if (res.ok) {
                         const data = await res.json();
@@ -1604,10 +1636,73 @@
             await populateTechnicianSelect(request.assignedTo);
             const isPending = (request.status || '').toLowerCase() === 'pending';
             document.getElementById('confirmPendingWrap').style.display = isPending ? 'block' : 'none';
-            document.getElementById('editSubtitle').textContent = `${request.id} — admin edit`;
+            // Admin confirmation of work — show verified state
+            try {
+                const cwWrap = document.getElementById('confirmWorkWrap');
+                const cwState = document.getElementById('confirmWorkState');
+                const cwBtn = document.getElementById('confirmWorkBtn');
+                const uncBtn = document.getElementById('unconfirmWorkBtn');
+                if (cwWrap && cwState && cwBtn && uncBtn) {
+                    cwWrap.style.display = 'block';
+                    const isConfirmed = !!request.confirmed;
+                    const by = request.confirmedBy || request.confirmed_by || '';
+                    const at = request.confirmedAt || request.confirmed_at || '';
+                    const dateStr = at ? new Date(at).toLocaleString() : '';
+                    if (isConfirmed) {
+                        cwState.textContent = `✓ Confirmed by ${by || 'admin'}${dateStr ? ' on ' + dateStr : ''} — work verified by admin.`;
+                        cwState.style.color = '#166534';
+                        cwWrap.style.background = '#f0fdf4';
+                        cwWrap.style.borderColor = '#86efac';
+                        cwBtn.style.display = 'none';
+                        uncBtn.style.display = '';
+                    } else {
+                        const hint = (request.status || '').toLowerCase() === 'pending' ? ' (pending — item will be marked completed)' : '';
+                        cwState.textContent = `Admin verification — confirm that the work has been completed satisfactorily${hint}.`;
+                        cwState.style.color = '#14532d';
+                        cwWrap.style.background = '#f0fdf4';
+                        cwWrap.style.borderColor = '#86efac';
+                        cwBtn.style.display = '';
+                        uncBtn.style.display = 'none';
+                    }
+                }
+            } catch {}
+            document.getElementById('editSubtitle').textContent = `${request.id} — admin edit${request.confirmed ? ' ✓ Confirmed' : ''}`;
             document.getElementById('editRequestOverlay').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
+        async function confirmWork() {
+            if (!editingRequestId) return;
+            const req = serverRequestsCache.find(r => r.id === editingRequestId) || getVisibleRequests().find(r => r.id === editingRequestId);
+            if (req && req.confirmed) { alert('Already confirmed'); return; }
+            if (!confirm('✓ Confirm work as verified by admin? This will mark the request as Completed and stamp your admin confirmation.')) return;
+            const prio = document.getElementById('editPriority').value;
+            const tech = document.getElementById('editTechnician').value.trim() || (req && req.assignedTo) || 'Pending Assignment';
+            await findAndUpdateRequest(editingRequestId, { status: 'completed', priority: prio, assignedTo: tech, confirmed: true });
+            closeEdit();
+            await loadRequests();
+            alert('✅ Work confirmed by admin — request marked Completed & Verified.');
+        }
+        async function unconfirmWork() {
+            if (!editingRequestId) return;
+            if (!confirm('Revoke admin confirmation? Request will stay Completed but without verified badge.')) return;
+            await findAndUpdateRequest(editingRequestId, { confirmed: false });
+            closeEdit();
+            await loadRequests();
+            alert('↩ Confirmation revoked.');
+        }
+        window.confirmWork = confirmWork;
+        window.unconfirmWork = unconfirmWork;
+        async function quickConfirm(requestId) {
+            const role = (window.facilixAuth && window.facilixAuth.getRole && window.facilixAuth.getRole()) || (getCurrentUser()?.role) || '';
+            if (role !== 'admin' && role !== 'superadmin') { alert('⛔ Only admin can confirm work'); return; }
+            let req = serverRequestsCache.find(r => r.id === requestId) || getVisibleRequests().find(r => r.id === requestId);
+            if (!req) { alert('❌ Request not found'); return; }
+            if (req.confirmed) { alert('Already confirmed'); return; }
+            if (!confirm(`✓ Confirm work for ${requestId} as verified by admin?`)) return;
+            await findAndUpdateRequest(requestId, { status: 'completed', confirmed: true });
+            await loadRequests();
+        }
+        window.quickConfirm = quickConfirm;
         async function confirmPending() {
             if (!editingRequestId) return;
             const tech = document.getElementById('editTechnician').value.trim();
