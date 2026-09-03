@@ -13,7 +13,6 @@
     { href: "services.html", label: "Services", test: (p) => p === "services.html" || p === "services-dashboard.html", roles: ["complainant","technician", null] },
     { href: "reports.html", label: "Reports", test: (p) => p === "reports.html" || p === "reports-dashboard.html", roles: [] },
     { href: "requests.html", label: "Requests", test: (p) => p === "requests.html", roles: [] },
-    { href: "technician-dashboard.html", label: "Technician", test: (p) => p === "technician-dashboard.html", roles: ["technician","admin","superadmin"] },
     { href: "technicians.html", label: "Technicians", test: (p) => p === "technicians.html", roles: ["admin","superadmin"] },
     { href: "about.html", label: "About", test: (p) => p === "about.html" || p === "about-dashboard.html", roles: ["complainant","technician","admin","superadmin", null] },
   ];

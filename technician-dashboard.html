@@ -199,8 +199,8 @@
             let user = window.getCurrentUser ? window.getCurrentUser() : null;
             try{ const me = await window.facilixAuth.fetchMe(); if(me) user=me; }catch{}
             if(!user){ alert('❌ Please login'); window.location.href='login.html'; return null; }
-            if(user.role !== 'technician' && user.role !== 'admin' && user.role !== 'superadmin'){
-                alert('⛔ Technician dashboard is for technician role. Your role: '+user.role+' — redirecting to Requests'); window.location.href='requests.html'; return null;
+            if(user.role !== 'technician'){
+                alert('⛔ Technician dashboard is stand-alone for technician only. Your role: '+user.role); window.location.href = (user.role==='admin'||user.role==='superadmin') ? 'technicians.html' : 'index.html'; return null;
             }
             return user;
         }
@@ -502,8 +502,6 @@
             const user=await checkTechLogin();
             if(!user) return;
             document.getElementById('techBadge').textContent=`${user.fullname||user.username} — ${user.role}`;
-            // if superadmin/admin landed here, note they can see all
-            if(user.role==='admin'||user.role==='superadmin'){ document.getElementById('techBadge').textContent+=' (viewing technician jobs)'; }
             await loadJobs();
             setInterval(loadJobs, 3000);
         });
