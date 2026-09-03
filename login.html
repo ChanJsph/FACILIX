@@ -223,7 +223,7 @@
             <div id="user-login" class="form-content active">
                 <h2>Welcome Back</h2>
                 <p>Login to your FACILIX account</p>
-                <p style="font-size:12px;color:#856404;background:#fff3cd;padding:6px;border-radius:4px;margin:-10px 0 14px;">Demo: complainant@facilix.com / User123! — overlord / admin123 (superadmin)</p>
+                <p style="font-size:12px;color:#856404;background:#fff3cd;padding:6px;border-radius:4px;margin:-10px 0 14px;">Demo: complainant <code>complainant@facilix.com / User123!</code> • technician <code>technician@facilix.com / Tech123!</code> • admin <code>admin@facilix.com / Admin123!</code> • overlord <code>overlord / admin123</code></p>
 
                 <div class="form-group">
                     <label for="email">Email or Username</label>
@@ -343,7 +343,8 @@
                 if (!res.ok || !data.ok) { alert('❌ ' + (data.error || 'Login failed')); btn.textContent = orig; btn.disabled = false; return; }
                 window.facilixAuth.setSession(data.token, data.user);
                 alert(`✅ Welcome ${data.user.fullname} (${data.user.role})`);
-                setTimeout(() => { window.location.href = 'index.html'; }, 600);
+                const dest = data.user.role === 'technician' ? 'technician-dashboard.html' : 'index.html';
+                setTimeout(() => { window.location.href = dest; }, 600);
             } catch (err) {
                 console.error(err);
                 alert('❌ Network error — is Deno server running?');

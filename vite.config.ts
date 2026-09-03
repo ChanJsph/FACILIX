@@ -49,6 +49,7 @@ export default defineConfig({
         about: resolve(__dirname, "about.html"),
         "about-dashboard": resolve(__dirname, "about-dashboard.html"),
         technicians: resolve(__dirname, "technicians.html"),
+        "technician-dashboard": resolve(__dirname, "technician-dashboard.html"),
       },
     },
   },

@@ -126,6 +126,23 @@ try {
   console.warn("  ⚠️ requests confirmation migration failed", e);
 }
 
+// Migration: technician evidence + required materials (JSON arrays)
+try {
+  const rcols2 = db.prepare("PRAGMA table_info(requests)").all() as { name: string }[];
+  const hasEvidence = rcols2.some((c) => c.name === "evidence_json");
+  const hasMaterials = rcols2.some((c) => c.name === "materials_json");
+  if (!hasEvidence) {
+    db.exec("ALTER TABLE requests ADD COLUMN evidence_json TEXT NOT NULL DEFAULT '[]';");
+    console.log("  🔧 migrated: added requests.evidence_json");
+  }
+  if (!hasMaterials) {
+    db.exec("ALTER TABLE requests ADD COLUMN materials_json TEXT NOT NULL DEFAULT '[]';");
+    console.log("  🔧 migrated: added requests.materials_json");
+  }
+} catch (e) {
+  console.warn("  ⚠️ requests evidence/materials migration failed", e);
+}
+
 // Seed helpers
 function userExists(email: string): boolean {
   const row = db.prepare("SELECT 1 FROM users WHERE email = ? COLLATE NOCASE").get(email.toLowerCase());
@@ -265,10 +282,16 @@ export type RequestRow = {
   confirmed: number; // 0/1 — admin confirmation of work
   confirmed_by: string | null;
   confirmed_at: string | null;
+  evidence_json: string; // JSON array of {id,name,dataUrl,size,uploadedAt,uploadedBy}
+  materials_json: string; // JSON array of {id,name,qty,unit,note,addedAt,addedBy}
   created_at: string;
   updated_at: string;
 };
 
+function safeParseJsonArray(s: string | null): unknown[] {
+  if (!s) return [];
+  try { const v = JSON.parse(s); return Array.isArray(v) ? v : []; } catch { return []; }
+}
 export function toFrontendRequest(r: RequestRow & { owner_role?: string; owner_fullname?: string }) {
   return {
     id: r.public_id,
@@ -290,6 +313,8 @@ export function toFrontendRequest(r: RequestRow & { owner_role?: string; owner_f
     confirmed: !!(r.confirmed ?? 0),
     confirmedBy: r.confirmed_by ?? null,
     confirmedAt: r.confirmed_at ?? null,
+    evidence: safeParseJsonArray((r as unknown as { evidence_json?: string }).evidence_json ?? null),
+    materials: safeParseJsonArray((r as unknown as { materials_json?: string }).materials_json ?? null),
   };
 }
 

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technician Dashboard - FACILIX</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <style>
+        .tech-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .tech-header {
+            background: linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%);
+            color: white;
+            padding: 28px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .tech-header h1 { margin:0; font-size:24px; font-weight:800; }
+        .tech-header p { margin:6px 0 0; color:#cbd5e1; font-size:13px; }
+        .tech-badge { background: rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); padding:8px 12px; border-radius:999px; font-size:12px; white-space:nowrap; }
+        .sample-box {
+            background: #fffbeb; border:1px solid #fcd34d; border-radius:10px; padding:14px 16px; margin-bottom:20px;
+            display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+        }
+        .sample-box strong { color:#92400e; }
+        .sample-box code { background:#fff; border:1px solid #fde68a; padding:4px 8px; border-radius:6px; font-size:13px; }
+        .stats-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; margin-bottom:24px; }
+        .stat-card { background:white; border:1px solid #eef2f7; border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+        .stat-card strong { font-size:22px; color:#0f2a47; }
+        .stat-card span { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; font-weight:700; }
+        .stat-card.pending strong { color:#d97706; }
+        .stat-card.progress strong { color:#2563eb; }
+        .stat-card.completed strong { color:#16a34a; }
+        .stat-card.high strong { color:#dc2626; }
+
+        .filter-bar {
+            display:inline-flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; align-items:center;
+            background:#f8fafc; border:1px solid #eef2f7; padding:6px; border-radius:999px; box-shadow:0 1px 4px rgba(15,42,71,0.04);
+        }
+        .filter-btn { padding:8px 14px; border:1px solid transparent; background:transparent; border-radius:999px; cursor:pointer; font-weight:700; font-size:13px; color:#475569; transition:all 0.2s; }
+        .filter-btn:hover { background:#fff; border-color:#e2e8f0; color:#0f2a47; }
+        .filter-btn.active { background:#0f2a47; border-color:#0f2a47; color:#fff; box-shadow:0 4px 12px rgba(15,42,71,0.22); }
+        .filter-btn .pill-count { display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 5px; margin-left:6px; font-size:11px; font-weight:800; border-radius:999px; background:#eef2f7; color:#475569; }
+        .filter-btn.active .pill-count { background:rgba(255,255,255,0.22); color:#fff; }
+        .filter-btn[data-status="pending"]::before, .filter-btn[data-status="in-progress"]::before, .filter-btn[data-status="completed"]::before { content:""; display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; transform:translateY(-0.5px); }
+        .filter-btn[data-status="pending"]::before { background:#ffc107; box-shadow:0 0 0 3px #fff3cd; }
+        .filter-btn[data-status="in-progress"]::before { background:#3b82f6; box-shadow:0 0 0 3px #dbeafe; }
+        .filter-btn[data-status="completed"]::before { background:#10b981; box-shadow:0 0 0 3px #d1fae5; }
+
+        .requests-grid { display:flex; flex-direction:column; gap:10px; margin-bottom:40px; }
+        .req-row { background:white; border:1px solid #eef2f7; border-radius:12px; overflow:hidden; box-shadow:0 1px 6px rgba(15,42,71,0.06); transition:all 0.2s; }
+        .req-row:hover { border-color:#e2e8f0; box-shadow:0 4px 16px rgba(15,42,71,0.10); }
+        .req-row.expanded { border-color:#cbd5e1; box-shadow:0 6px 20px rgba(15,42,71,0.12); }
+        .req-row-header { display:flex; align-items:center; gap:12px; padding:12px 14px; cursor:pointer; user-select:none; }
+        .req-row-header:hover { background:#f8fafc; }
+        .req-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+        .req-dot.pending { background:#f59e0b; box-shadow:0 0 0 4px #fef3c7; }
+        .req-dot.in-progress { background:#3b82f6; box-shadow:0 0 0 4px #dbeafe; }
+        .req-dot.completed { background:#10b981; box-shadow:0 0 0 4px #d1fae5; }
+        .req-dot.rejected { background:#ef4444; box-shadow:0 0 0 4px #fee2e2; }
+        .req-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+        .req-title { font-size:13.5px; font-weight:800; color:#0f2a47; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .req-sub { font-size:11.5px; color:#64748b; display:flex; gap:6px; align-items:center; }
+        .req-sub .sep { opacity:0.4; }
+        .req-id { font-size:11px; color:#94a3b8; font-weight:700; }
+        .req-complainant { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:#0f2a47; background:#f8fafc; border:1px solid #eef2f7; padding:6px 10px; border-radius:999px; white-space:nowrap; max-width:150px; overflow:hidden; text-overflow:ellipsis; }
+        .req-complainant .req-avatar { width:22px; height:22px; border-radius:50%; background:#0f2a47; color:#fff; display:grid; place-items:center; font-weight:900; font-size:10px; flex-shrink:0; }
+        .req-priority { font-size:11px; font-weight:800; padding:4px 8px; border-radius:999px; border:1px solid transparent; flex-shrink:0; }
+        .req-priority.Low { background:#f1f5f9; color:#475569; border-color:#e2e8f0; }
+        .req-priority.Medium { background:#fffbeb; color:#92400e; border-color:#fde68a; }
+        .req-priority.High { background:#fef2f2; color:#991b1b; border-color:#fecaca; }
+        .req-priority.Urgent { background:#dc2626; color:white; border-color:#dc2626; }
+        .req-chevron { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:#f1f5f9; color:#64748b; font-size:12px; flex-shrink:0; transition:transform 0.22s, background 0.2s; }
+        .req-row.expanded .req-chevron { transform:rotate(180deg); background:#0f2a47; color:white; }
+        .req-body { max-height:0; overflow:hidden; transition:max-height 0.28s, opacity 0.2s; opacity:0; background:#fcfdff; border-top:1px solid transparent; }
+        .req-row.expanded .req-body { max-height:600px; opacity:1; border-top-color:#eef2f7; }
+        .req-body-inner { padding:14px 16px 16px; display:grid; gap:12px; }
+        .req-desc { font-size:13px; color:#334155; line-height:1.6; background:white; border:1px solid #eef2f7; border-radius:10px; padding:12px 14px; white-space:pre-wrap; }
+        .req-meta-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .req-meta-box { background:white; border:1px solid #eef2f7; border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:3px; }
+        .req-meta-box strong { font-size:10px; letter-spacing:0.6px; text-transform:uppercase; color:#64748b; font-weight:700; }
+        .req-meta-box span { font-size:12.5px; font-weight:700; color:#0f2a47; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .req-actions { display:flex; gap:8px; flex-wrap:wrap; }
+        .btn-view { flex:1; padding:10px; background:#0f2a47; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+        .btn-edit { flex:1; padding:10px; background:#ffc107; color:#0f2a47; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+        .btn-start { flex:1; padding:10px; background:#2563eb; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
+        .btn-complete { flex:1; padding:10px; background:#16a34a; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
+        .empty-state { text-align:center; padding:60px 20px; background:white; border:1px solid #eef2f7; border-radius:12px; }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns:repeat(2,1fr); }
+            .req-meta-grid { grid-template-columns:repeat(2,1fr); }
+            .tech-header { flex-direction:column; align-items:flex-start; }
+        }
+        /* overlay reuse */
+        .request-form-overlay { display:none; position:fixed; inset:0; background:rgba(15,42,71,0.55); backdrop-filter:blur(4px); z-index:200; align-items:center; justify-content:center; padding:20px; }
+        .request-form-overlay.active { display:flex; }
+        .request-form-container { background:white; border-radius:12px; max-width:720px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
+        .request-form-header { background:linear-gradient(135deg, #0f2a47 0%, #1a3a57 100%); color:white; padding:24px 28px; border-radius:12px 12px 0 0; display:flex; justify-content:space-between; align-items:center; }
+        .request-form-header h2 { margin:0; font-size:22px; }
+        .request-form-header p { margin:6px 0 0; color:#ccc; font-size:13px; }
+        .btn-close-form { background:rgba(255,255,255,0.15); border:none; color:white; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:20px; display:grid; place-items:center; }
+        .request-form-body { padding:20px 28px 24px; }
+        .request-status { padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; }
+        .status-pending { background:#fff3cd; color:#856404; }
+        .status-in-progress { background:#cfe2ff; color:#084298; }
+        .status-completed { background:#d1e7dd; color:#0a3622; }
+        .status-rejected { background:#f8d7da; color:#842029; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo"><span class="logo-icon">⚙️</span><span class="logo-text">FACILIX</span></a>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="reports.html" class="nav-link">Reports</a>
+                <a href="requests.html" class="nav-link">Requests</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            <div class="auth-buttons">
+                <a href="register.html" class="register-btn">Register</a>
+                <a href="login.html" class="login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="tech-container">
+        <div class="tech-header">
+            <div>
+                <h1>🔧 Technician Dashboard</h1>
+                <p>Jobs assigned to you — update status when you start and complete work</p>
+            </div>
+            <span class="tech-badge" id="techBadge">Loading...</span>
+        </div>
+
+        <div class="sample-box" id="sampleBox">
+            <div>
+                <div style="font-size:13px; font-weight:800; color:#0f2a47;">Sample Technician Account</div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">Use this to login as technician — or create more via superadmin at <code>technicians.html</code></div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <code>technician@facilix.com</code>
+                <code>Tech123!</code>
+                <button onclick="copySample()" style="padding:6px 10px; border:1px solid #fcd34d; background:#fff; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;">Copy</button>
+                <a href="login.html" style="padding:6px 10px; background:#0f2a47; color:white; border-radius:6px; text-decoration:none; font-weight:700; font-size:12px;">Go to Login</a>
+            </div>
+        </div>
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:10px 14px; margin-bottom:18px; font-size:12px; color:#166534;">
+            <strong>Other seeded accounts:</strong> superadmin <code>superadmin@facilix.com / SuperAdmin123!</code> • admin <code>admin@facilix.com / Admin123!</code> • complainant <code>complainant@facilix.com / User123!</code> • overlord <code>lanachristianjosephd@gmail.com / admin123</code> (superadmin, username: <code>overlord</code>) — 2FA for admin login is <code>123456</code>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><span>Assigned</span><strong id="statAssigned">0</strong></div>
+            <div class="stat-card pending"><span>Pending</span><strong id="statPending">0</strong></div>
+            <div class="stat-card progress"><span>In Progress</span><strong id="statProgress">0</strong></div>
+            <div class="stat-card completed"><span>Completed</span><strong id="statCompleted">0</strong></div>
+        </div>
+
+        <div class="filter-bar" role="group" aria-label="Filter jobs">
+            <button class="filter-btn active" data-status="all" onclick="filterJobs('all')">All <span class="pill-count" id="pill-all">0</span></button>
+            <button class="filter-btn" data-status="pending" onclick="filterJobs('pending')">Pending <span class="pill-count" id="pill-pending">0</span></button>
+            <button class="filter-btn" data-status="in-progress" onclick="filterJobs('in-progress')">In Progress <span class="pill-count" id="pill-in-progress">0</span></button>
+            <button class="filter-btn" data-status="completed" onclick="filterJobs('completed')">Completed <span class="pill-count" id="pill-completed">0</span></button>
+        </div>
+
+        <div class="requests-grid" id="jobsGrid"></div>
+        <div id="emptyState" class="empty-state" style="display:none;">
+            <div style="font-size:48px; margin-bottom:12px;">📭</div>
+            <h3 style="margin:0 0 8px; color:#0f2a47;">No Assigned Jobs</h3>
+            <p style="color:#64748b; margin:0 0 12px;">Jobs assigned to you by admin will appear here. For demo, admin can assign <code>Alex Technician</code> in Requests → Edit.</p>
+            <a href="requests.html" style="display:inline-block; margin-top:8px; padding:10px 16px; background:#0f2a47; color:white; border-radius:6px; text-decoration:none; font-weight:700;">View All Requests</a>
+        </div>
+    </div>
+
+    <!-- Details Overlay -->
+    <div class="request-form-overlay" id="detailsOverlay">
+        <div class="request-form-container">
+            <div class="request-form-header">
+                <div><h2>📋 Job Details</h2><p id="detailsSubtitle">Full complaint information</p></div>
+                <button class="btn-close-form" onclick="closeDetails()" aria-label="Close">×</button>
+            </div>
+            <div class="request-form-body" id="detailsBody"></div>
+        </div>
+    </div>
+
+    <script src="scripts/script.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script>
+        function copySample(){ const t='technician@facilix.com / Tech123!'; navigator.clipboard.writeText(t).then(()=>alert('Copied: '+t)).catch(()=>prompt('Copy:', t)); }
+        function getToken(){ return localStorage.getItem('facilix_token'); }
+        function getHeaders(){ const t=getToken(); return t? { 'Authorization':'Bearer '+t, 'Content-Type':'application/json'} : { 'Content-Type':'application/json'}; }
+        async function checkTechLogin(){
+            let user = window.getCurrentUser ? window.getCurrentUser() : null;
+            try{ const me = await window.facilixAuth.fetchMe(); if(me) user=me; }catch{}
+            if(!user){ alert('❌ Please login'); window.location.href='login.html'; return null; }
+            if(user.role !== 'technician' && user.role !== 'admin' && user.role !== 'superadmin'){
+                alert('⛔ Technician dashboard is for technician role. Your role: '+user.role+' — redirecting to Requests'); window.location.href='requests.html'; return null;
+            }
+            return user;
+        }
+        let allJobs = [];
+        let currentFilter = 'all';
+        function escapeHtml(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function toggleRow(id){ const row=document.getElementById('row-'+id); if(!row) return; const was=row.classList.contains('expanded'); document.querySelectorAll('.req-row.expanded').forEach(r=>r.classList.remove('expanded')); if(!was) row.classList.add('expanded'); }
+        window.toggleRow = toggleRow;
+
+        async function loadJobs(){
+            const grid=document.getElementById('jobsGrid');
+            const empty=document.getElementById('emptyState');
+            const token=getToken();
+            if(!token){ grid.innerHTML=''; empty.style.display='block'; return; }
+            try{
+                const res=await fetch('/api/requests', { headers: { 'Authorization':'Bearer '+token } });
+                if(!res.ok) throw new Error('fetch failed '+res.status);
+                const data=await res.json();
+                if(!data.ok) throw new Error(data.error);
+                allJobs = data.requests || [];
+            }catch(e){
+                console.warn(e);
+                grid.innerHTML=`<div class="empty-state">Failed to load jobs — is server running?</div>`;
+                return;
+            }
+            updateStats(allJobs);
+            applyFilter();
+        }
+        function updateStats(jobs){
+            const c={ all:jobs.length, pending:0, 'in-progress':0, completed:0 };
+            jobs.forEach(j=>{ if(j.status in c) c[j.status]++; });
+            document.getElementById('statAssigned').textContent=c.all;
+            document.getElementById('statPending').textContent=c.pending;
+            document.getElementById('statProgress').textContent=c['in-progress'];
+            document.getElementById('statCompleted').textContent=c.completed;
+            const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=String(v); };
+            set('pill-all', c.all); set('pill-pending', c.pending); set('pill-in-progress', c['in-progress']); set('pill-completed', c.completed);
+        }
+        function applyFilter(){
+            let filtered=allJobs;
+            if(currentFilter!=='all') filtered=allJobs.filter(j=>j.status===currentFilter);
+            renderJobs(filtered);
+        }
+        function filterJobs(f){
+            currentFilter=f;
+            document.querySelectorAll('.filter-btn').forEach(b=> b.classList.toggle('active', b.dataset.status===f));
+            applyFilter();
+        }
+        window.filterJobs = filterJobs;
+
+        function getEvidence(job){ return Array.isArray(job.evidence) ? job.evidence : []; }
+        function getMaterials(job){ return Array.isArray(job.materials) ? job.materials : []; }
+        async function persistEvidence(jobId, evidence){
+            try{
+                const res=await fetch('/api/requests/'+encodeURIComponent(jobId), { method:'PUT', headers:getHeaders(), body:JSON.stringify({ evidence }) });
+                const data=await res.json();
+                if(!res.ok || !data.ok) throw new Error(data.error||'failed');
+                const idx=allJobs.findIndex(j=>j.id===jobId);
+                if(idx!==-1) allJobs[idx]=data.request;
+                applyFilter();
+            }catch(e){ alert('❌ Evidence save failed: '+e.message); }
+        }
+        async function persistMaterials(jobId, materials){
+            try{
+                const res=await fetch('/api/requests/'+encodeURIComponent(jobId), { method:'PUT', headers:getHeaders(), body:JSON.stringify({ materials }) });
+                const data=await res.json();
+                if(!res.ok || !data.ok) throw new Error(data.error||'failed');
+                const idx=allJobs.findIndex(j=>j.id===jobId);
+                if(idx!==-1) allJobs[idx]=data.request;
+                applyFilter();
+            }catch(e){ alert('❌ Materials save failed: '+e.message); }
+        }
+        function handleEvidenceInput(jobId, input){
+            const files = Array.from(input.files || []);
+            if(!files.length) return;
+            const job = allJobs.find(j=>j.id===jobId);
+            if(!job) return;
+            const existing = getEvidence(job);
+            if(existing.length + files.length > 20){ alert('Max 20 evidence files per job'); input.value=''; return; }
+            const readers = files.map(file => new Promise(resolve=>{
+                const r=new FileReader();
+                r.onload = ()=> resolve({ id:'ev-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), name:file.name, dataUrl: (file.type.startsWith('image/') ? r.result : null), size:file.size, uploadedAt:new Date().toISOString(), uploadedBy:(window.getCurrentUser&&window.getCurrentUser()?.email)||'technician' });
+                r.onerror = ()=> resolve({ id:'ev-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), name:file.name, dataUrl:null, size:file.size, uploadedAt:new Date().toISOString(), uploadedBy:'technician' });
+                if(file.type.startsWith('image/')) r.readAsDataURL(file);
+                else { // non-image: just store name without dataUrl
+                    resolve({ id:'ev-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), name:file.name, dataUrl:null, size:file.size, uploadedAt:new Date().toISOString(), uploadedBy:(window.getCurrentUser&&window.getCurrentUser()?.email)||'technician' });
+                }
+            }));
+            Promise.all(readers).then(newEvs => {
+                const merged = [...existing, ...newEvs];
+                persistEvidence(jobId, merged);
+            });
+            input.value='';
+        }
+        window.handleEvidenceInput = handleEvidenceInput;
+        function removeEvidence(jobId, evId){
+            if(!confirm('Remove this evidence?')) return;
+            const job=allJobs.find(j=>j.id===jobId);
+            if(!job) return;
+            const filtered=getEvidence(job).filter(e=>e.id!==evId);
+            persistEvidence(jobId, filtered);
+        }
+        window.removeEvidence = removeEvidence;
+        function addMaterial(jobId){
+            const nameEl=document.getElementById('mt-name-'+jobId);
+            const qtyEl=document.getElementById('mt-qty-'+jobId);
+            const unitEl=document.getElementById('mt-unit-'+jobId);
+            const noteEl=document.getElementById('mt-note-'+jobId);
+            const name=(nameEl?.value||'').trim();
+            const qty=parseFloat(qtyEl?.value||'0');
+            const unit=(unitEl?.value||'pcs').trim()||'pcs';
+            const note=(noteEl?.value||'').trim();
+            if(!name){ alert('Enter material name'); nameEl?.focus(); return; }
+            if(!qty || qty<=0){ alert('Enter valid quantity'); qtyEl?.focus(); return; }
+            const job=allJobs.find(j=>j.id===jobId);
+            if(!job) return;
+            const existing=getMaterials(job);
+            if(existing.length>=50){ alert('Max 50 materials'); return; }
+            const entry={ id:'mt-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), name, qty, unit, note, addedAt:new Date().toISOString(), addedBy:(window.getCurrentUser&&window.getCurrentUser()?.email)||'technician' };
+            const merged=[...existing, entry];
+            persistMaterials(jobId, merged);
+            if(nameEl) nameEl.value=''; if(qtyEl) qtyEl.value=''; if(unitEl) unitEl.value='pcs'; if(noteEl) noteEl.value='';
+        }
+        window.addMaterial = addMaterial;
+        function removeMaterial(jobId, matId){
+            if(!confirm('Remove this material?')) return;
+            const job=allJobs.find(j=>j.id===jobId);
+            if(!job) return;
+            const filtered=getMaterials(job).filter(m=>m.id!==matId);
+            persistMaterials(jobId, filtered);
+        }
+        window.removeMaterial = removeMaterial;
+
+        function renderJobs(jobs){
+            const grid=document.getElementById('jobsGrid');
+            const empty=document.getElementById('emptyState');
+            if(jobs.length===0){
+                grid.style.display='none'; empty.style.display='block'; grid.innerHTML=''; return;
+            }
+            grid.style.display='flex'; empty.style.display='none'; grid.innerHTML='';
+            jobs.forEach(job=>{
+                const statusKey=(job.status||'pending').toLowerCase();
+                const dotClass=statusKey==='in-progress'?'in-progress':statusKey;
+                const prio=job.priority||'Medium';
+                const owner=job.owner||job.owner_email||'Unknown';
+                const ownerShort=owner.includes('@')?owner.split('@')[0]:owner;
+                const avatar=(ownerShort[0]||'U').toUpperCase();
+                const cat=job.category||job.type||'';
+                const loc=job.location||'';
+                const due=job.dueDate||job.due_date||'';
+                const isConfirmed=!!job.confirmed;
+                const confirmedBy=job.confirmedBy||job.confirmed_by||'';
+                const confirmedAt=job.confirmedAt||job.confirmed_at||'';
+                const confirmedBadge=isConfirmed? `<span title="Confirmed by ${escapeHtml(confirmedBy)}" style="font-size:10px;font-weight:800;color:#166534;background:#f0fdf4;border:1px solid #86efac;padding:4px 8px;border-radius:999px;white-space:nowrap;">✓ Confirmed</span>`:'';
+                const evList=getEvidence(job);
+                const mtList=getMaterials(job);
+                const row=document.createElement('div');
+                row.className='req-row'; row.id='row-'+job.id;
+                if(isConfirmed) row.style.borderColor='#86efac';
+                const actions = (()=> {
+                    if(statusKey==='pending') return `<button class="btn-start" onclick="event.stopPropagation(); updateStatus('${job.id}','in-progress')">▶ Start Work</button>`;
+                    if(statusKey==='in-progress') return `<button class="btn-complete" onclick="event.stopPropagation(); updateStatus('${job.id}','completed')">✓ Mark Complete</button>`;
+                    if(statusKey==='completed' && isConfirmed) return `<span style="flex:1;text-align:center;padding:10px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;color:#166534;font-weight:700;font-size:13px;">✓ Verified by admin</span>`;
+                    if(statusKey==='completed') return `<span style="flex:1;text-align:center;padding:10px;background:#f8fafc;border:1px solid #eef2f7;border-radius:6px;color:#64748b;font-weight:600;font-size:12px;">Awaiting admin confirmation</span>`;
+                    return '';
+                })();
+                const evidenceHtml = `
+                    <div style="background:white;border:1px solid #eef2f7;border-radius:10px;padding:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                            <div style="font-size:11px;letter-spacing:0.6px;text-transform:uppercase;color:#64748b;font-weight:700;">📎 Repair Evidence <span style="text-transform:none;font-weight:800;color:#0f2a47;">${evList.length ? `• ${evList.length}` : ''}</span></div>
+                            <label style="font-size:11px;font-weight:700;color:#0f2a47;background:#f8fafc;border:1px solid #e2e8f0;padding:6px 10px;border-radius:999px;cursor:pointer;">+ Upload <input type="file" accept="image/*,.pdf,.doc,.docx" multiple style="display:none;" onchange="handleEvidenceInput('${job.id}', this)"></label>
+                        </div>
+                        ${evList.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${evList.map(ev=>`
+                            <div style="width:92px;border:1px solid #eef2f7;border-radius:8px;overflow:hidden;background:#f8fafc;">
+                                ${ev.dataUrl ? `<img src="${escapeHtml(ev.dataUrl)}" style="width:100%;height:64px;object-fit:cover;display:block;" alt="${escapeHtml(ev.name)}">` : `<div style="height:64px;display:grid;place-items:center;background:#eef2f7;color:#64748b;font-size:20px;">📄</div>`}
+                                <div style="padding:6px;">
+                                    <div style="font-size:10px;font-weight:700;color:#0f2a47;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(ev.name)}">${escapeHtml(ev.name)}</div>
+                                    <div style="font-size:10px;color:#64748b;">${ev.size ? (ev.size/1024).toFixed(1)+' KB' : ''}</div>
+                                    <button onclick="event.stopPropagation(); removeEvidence('${job.id}','${ev.id}')" style="margin-top:4px;width:100%;padding:4px;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;">Remove</button>
+                                </div>
+                            </div>
+                        `).join('')}</div>` : `<div style="margin-top:8px;font-size:12px;color:#64748b;background:#f8fafc;border:1px dashed #e2e8f0;padding:8px;border-radius:8px;">No evidence yet — upload photos of the repair (before/after).</div>`}
+                    </div>`;
+                const materialsHtml = `
+                    <div style="background:white;border:1px solid #eef2f7;border-radius:10px;padding:12px;">
+                        <div style="font-size:11px;letter-spacing:0.6px;text-transform:uppercase;color:#64748b;font-weight:700;">🧰 Required Materials <span style="text-transform:none;font-weight:800;color:#0f2a47;">${mtList.length ? `• ${mtList.length}` : ''}</span></div>
+                        <div style="display:grid;grid-template-columns:1.2fr 80px 80px auto;gap:6px;margin-top:10px;align-items:center;">
+                            <input id="mt-name-${job.id}" placeholder="Item name (e.g. PVC Pipe)" style="padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;">
+                            <input id="mt-qty-${job.id}" type="number" min="0" step="0.1" placeholder="Qty" style="padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;">
+                            <input id="mt-unit-${job.id}" placeholder="pcs" value="pcs" style="padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;">
+                            <input id="mt-note-${job.id}" placeholder="note (optional)" style="padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;">
+                        </div>
+                        <button onclick="event.stopPropagation(); addMaterial('${job.id}')" style="margin-top:6px;width:100%;padding:8px;background:#0f2a47;color:white;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;">+ Add Material</button>
+                        ${mtList.length ? `<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">${mtList.map(m=>`
+                            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;">
+                                <div style="min-width:0;"><div style="font-size:12px;font-weight:800;color:#0f2a47;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(m.name)} — ${escapeHtml(String(m.qty))} ${escapeHtml(m.unit)}</div><div style="font-size:11px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(m.note||'')}</div></div>
+                                <button onclick="event.stopPropagation(); removeMaterial('${job.id}','${m.id}')" style="padding:6px 8px;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">Remove</button>
+                            </div>
+                        `).join('')}</div>` : `<div style="margin-top:8px;font-size:12px;color:#64748b;background:#f8fafc;border:1px dashed #e2e8f0;padding:8px;border-radius:8px;">No materials recorded — add pipes, bulbs, tools used.</div>`}
+                    </div>`;
+                row.innerHTML=`
+                    <div class="req-row-header" onclick="toggleRow('${job.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleRow('${job.id}')}">
+                        <span class="req-dot ${dotClass}"></span>
+                        <div class="req-main">
+                            <div class="req-title">${escapeHtml(job.title)}${isConfirmed?' <span style="color:#16a34a;font-size:11px;">✓</span>':''}</div>
+                            <div class="req-sub">
+                                <span class="req-id">${escapeHtml(job.id)}</span>
+                                ${cat?`<span class="sep">•</span><span>${escapeHtml(cat)}</span>`:''}
+                                ${loc?`<span class="sep">•</span><span>${escapeHtml(loc)}</span>`:''}
+                                ${due?`<span class="sep">•</span><span>Due ${escapeHtml(due)}</span>`:''}
+                                ${evList.length?`<span class="sep">•</span><span>📎 ${evList.length}</span>`:''}
+                                ${mtList.length?`<span class="sep">•</span><span>🧰 ${mtList.length}</span>`:''}
+                            </div>
+                        </div>
+                        <span class="req-complainant" title="${escapeHtml(owner)}"><span class="req-avatar">${escapeHtml(avatar)}</span><span style="overflow:hidden;text-overflow:ellipsis;">${escapeHtml(ownerShort)}</span></span>
+                        ${confirmedBadge}
+                        <span class="req-priority ${escapeHtml(prio)}">${escapeHtml(prio)}</span>
+                        <span class="req-chevron">⌄</span>
+                    </div>
+                    <div class="req-body">
+                        <div class="req-body-inner">
+                            <div class="req-desc">${escapeHtml(job.description||'No description')}</div>
+                            <div class="req-meta-grid">
+                                <div class="req-meta-box"><strong>Category</strong><span>${escapeHtml(cat||'-')}</span></div>
+                                <div class="req-meta-box"><strong>Type</strong><span>${escapeHtml(job.type||'-')}</span></div>
+                                <div class="req-meta-box"><strong>Assigned</strong><span>${escapeHtml(job.assignedTo||'Pending')}</span></div>
+                                <div class="req-meta-box"><strong>Created</strong><span>${escapeHtml(job.createdDate||due||'-')}</span></div>
+                            </div>
+                            ${evidenceHtml}
+                            ${materialsHtml}
+                            ${isConfirmed?`<div style="font-size:12px;color:#166534;background:#f0fdf4;border:1px solid #86efac;padding:8px 10px;border-radius:8px;">✓ Confirmed by ${escapeHtml(confirmedBy||'admin')}${confirmedAt?` on ${escapeHtml(new Date(confirmedAt).toLocaleString())}`:''} — work verified</div>`:`<div style="font-size:11px;color:#64748b;background:#f8fafc;border:1px solid #eef2f7;padding:6px 10px;border-radius:8px;">👤 ${escapeHtml(owner)} • ${escapeHtml(job.status)}</div>`}
+                            <div class="req-actions">
+                                <button class="btn-view" onclick="event.stopPropagation(); viewJob('${job.id}')">View Details</button>
+                                ${actions}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(row);
+            });
+        }
+
+        async function updateStatus(id, newStatus){
+            const label = newStatus==='in-progress' ? 'Start work (In Progress)?' : 'Mark as Completed?';
+            if(!confirm(label + ' — ' + id)) return;
+            try{
+                const res=await fetch('/api/requests/'+encodeURIComponent(id), { method:'PUT', headers:getHeaders(), body:JSON.stringify({ status:newStatus }) });
+                const data=await res.json();
+                if(!res.ok || !data.ok) throw new Error(data.error||'failed');
+                await loadJobs();
+                alert('✅ Status → ' + newStatus);
+            }catch(e){ alert('❌ '+e.message); }
+        }
+        window.updateStatus = updateStatus;
+
+        function viewJob(id){
+            const job=allJobs.find(j=>j.id===id);
+            if(!job) return;
+            const sub=document.getElementById('detailsSubtitle');
+            if(sub) sub.textContent=`${job.id} — ${job.status}${job.confirmed?' ✓ Confirmed':''} • ${job.category||job.type||''}`;
+            const isConfirmed=!!job.confirmed;
+            const body=document.getElementById('detailsBody');
+            body.innerHTML=`
+                <div style="display:grid;gap:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                        <div><div style="font-size:11px;letter-spacing:0.6px;text-transform:uppercase;color:#64748b;font-weight:700;">Job</div><div style="font-size:18px;font-weight:800;color:#0f2a47;margin-top:4px;">${escapeHtml(job.title)}</div><div style="color:#64748b;font-size:12px;margin-top:4px;">${job.category?`📂 ${escapeHtml(job.category)}`:''} ${job.location?`• 📍 ${escapeHtml(job.location)}`:''}</div></div>
+                        <span class="request-status status-${(job.status||'pending').replace(' ','-')}">${escapeHtml(job.status)}</span>
+                    </div>
+                    <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:14px;display:grid;gap:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;"><span style="width:32px;height:32px;border-radius:50%;background:#0f2a47;color:white;display:grid;place-items:center;font-weight:800;font-size:13px;">${escapeHtml((job.owner||'U')[0].toUpperCase())}</span><div><div style="font-size:13px;font-weight:700;color:#0f2a47;">👤 Request by: ${escapeHtml(job.owner)}</div><div style="font-size:11px;color:#64748b;">${escapeHtml(job.ownerName||job.owner)} • ${escapeHtml(job.category||'')}</div></div></div>
+                        ${job.type?`<div style="font-size:12px;color:#0f2a47;"><strong>Service Types:</strong> ${escapeHtml(job.type)}</div>`:''}
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Priority</div><div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${escapeHtml(job.priority||'-')}</div></div>
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Assigned</div><div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${escapeHtml(job.assignedTo||'Pending')}</div></div>
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Created</div><div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${escapeHtml(job.createdDate||'-')}</div></div>
+                        <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:12px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Due</div><div style="font-size:13px;font-weight:700;color:#0f2a47;margin-top:4px;">${escapeHtml(job.dueDate||'-')}</div></div>
+                    </div>
+                    <div style="background:white;border:1px solid #eef2f7;border-radius:8px;padding:14px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Description</div><div style="font-size:13px;color:#334155;line-height:1.6;white-space:pre-wrap;">${escapeHtml(job.description||'-')}</div></div>
+                    ${(()=>{ const ev=getEvidence(job); return `<div style="background:white;border:1px solid #eef2f7;border-radius:8px;padding:14px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;margin-bottom:8px;">📎 Repair Evidence${ev.length?` • ${ev.length}`:''}</div>${ev.length?`<div style="display:flex;flex-wrap:wrap;gap:8px;">${ev.map(e=>`<div style="width:96px;border:1px solid #eef2f7;border-radius:8px;overflow:hidden;background:#f8fafc;">${e.dataUrl?`<img src="${escapeHtml(e.dataUrl)}" style="width:100%;height:66px;object-fit:cover;display:block;">`:`<div style="height:66px;display:grid;place-items:center;background:#eef2f7;color:#64748b;font-size:22px;">📄</div>`}<div style="padding:6px;"><div style="font-size:10px;font-weight:700;color:#0f2a47;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(e.name)}</div><div style="font-size:10px;color:#64748b;">${e.size?(e.size/1024).toFixed(1)+' KB':''}</div></div></div>`).join('')}</div>`:`<div style="font-size:12px;color:#64748b;background:#f8fafc;border:1px dashed #e2e8f0;padding:8px;border-radius:8px;">No evidence uploaded</div>`}</div>`; })()}
+                    ${(()=>{ const mt=getMaterials(job); return `<div style="background:white;border:1px solid #eef2f7;border-radius:8px;padding:14px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;margin-bottom:8px;">🧰 Required Materials${mt.length?` • ${mt.length}`:''}</div>${mt.length?`<div style="display:flex;flex-direction:column;gap:6px;">${mt.map(m=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 10px;background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;"><span style="font-size:12px;font-weight:800;color:#0f2a47;">${escapeHtml(m.name)} — ${escapeHtml(String(m.qty))} ${escapeHtml(m.unit)}</span><span style="font-size:11px;color:#64748b;">${escapeHtml(m.note||'')}</span></div>`).join('')}</div>`:`<div style="font-size:12px;color:#64748b;background:#f8fafc;border:1px dashed #e2e8f0;padding:8px;border-radius:8px;">No materials recorded</div>`}</div>`; })()}
+                    ${isConfirmed?`<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 12px;color:#166534;font-size:12px;">✓ Confirmed by admin${job.confirmedBy?` — ${escapeHtml(job.confirmedBy)}`:''}${job.confirmedAt?` on ${escapeHtml(new Date(job.confirmedAt).toLocaleString())}`:''} — work verified</div>`:`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;color:#92400e;font-size:12px;">⏳ Not yet confirmed by admin — complete work to trigger verification.</div>`}
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn-view" style="flex:1;" onclick="closeDetails()">Close</button>
+                        ${job.status==='pending'?`<button class="btn-start" style="flex:1;" onclick="closeDetails(); updateStatus('${job.id}','in-progress')">▶ Start Work</button>`:''}
+                        ${job.status==='in-progress'?`<button class="btn-complete" style="flex:1;" onclick="closeDetails(); updateStatus('${job.id}','completed')">✓ Complete</button>`:''}
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailsOverlay').classList.add('active');
+            document.body.style.overflow='hidden';
+        }
+        function closeDetails(){ document.getElementById('detailsOverlay').classList.remove('active'); document.body.style.overflow=''; }
+        window.viewJob = viewJob; window.closeDetails = closeDetails;
+        document.getElementById('detailsOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeDetails(); });
+        document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetails(); });
+
+        window.addEventListener('load', async ()=>{
+            const user=await checkTechLogin();
+            if(!user) return;
+            document.getElementById('techBadge').textContent=`${user.fullname||user.username} — ${user.role}`;
+            // if superadmin/admin landed here, note they can see all
+            if(user.role==='admin'||user.role==='superadmin'){ document.getElementById('techBadge').textContent+=' (viewing technician jobs)'; }
+            await loadJobs();
+            setInterval(loadJobs, 3000);
+        });
+    </script>
+</body>
+</html>

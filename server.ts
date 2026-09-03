@@ -304,8 +304,26 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
         rows = db.prepare(`SELECT r.*, u.role as owner_role, u.fullname as owner_fullname FROM requests r LEFT JOIN users u ON u.id = r.owner_id ORDER BY r.id DESC`).all() as Record<string, unknown>[];
       }
       if (filterStatus) rows = rows.filter((r) => String(r["status"]) === filterStatus);
+    } else if (role === "technician") {
+      // technician: own requests + assigned jobs (assigned_to matches fullname or username)
+      rows = db.prepare(`
+        SELECT r.*, u.role as owner_role, u.fullname as owner_fullname FROM requests r
+        LEFT JOIN users u ON u.id = r.owner_id
+        WHERE r.owner_id = ? OR r.owner_email = ? COLLATE NOCASE
+           OR r.assigned_to = ? COLLATE NOCASE OR r.assigned_to = ? COLLATE NOCASE
+        ORDER BY r.id DESC
+      `).all(user.id, user.email, user.fullname, (user as unknown as { username?: string }).username ?? "") as Record<string, unknown>[];
+      // de-duplicate by public_id (assigned + owned overlap)
+      const seen = new Set<string>();
+      rows = rows.filter((r) => {
+        const pid = String(r["public_id"]);
+        if (seen.has(pid)) return false;
+        seen.add(pid);
+        return true;
+      });
+      if (filterStatus) rows = rows.filter((r) => String(r["status"]) === filterStatus);
     } else {
-      // complainant/technician: only own requests
+      // complainant: only own requests
       rows = db.prepare(`SELECT r.*, u.role as owner_role, u.fullname as owner_fullname FROM requests r LEFT JOIN users u ON u.id = r.owner_id WHERE r.owner_id = ? OR r.owner_email = ? COLLATE NOCASE ORDER BY r.id DESC`).all(user.id, user.email) as Record<string, unknown>[];
       if (filterRole && filterRole !== role) {
         // non-admin cannot fetch other roles
@@ -326,7 +344,11 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
     if (!row) return json({ ok: false, error: "request not found" }, 404, req);
     const isAdmin = user.role === "admin" || user.role === "superadmin";
     const isOwner = String(row["owner_email"]).toLowerCase() === String(user.email).toLowerCase() || Number(row["owner_id"]) === Number(user.id);
-    if (!isAdmin && !isOwner) return json({ ok: false, error: "forbidden" }, 403, req);
+    const isTechnicianAssigned = user.role === "technician" && (
+      String(row["assigned_to"]).toLowerCase() === String(user.fullname).toLowerCase() ||
+      String(row["assigned_to"]).toLowerCase() === String((user as unknown as { username?: string }).username ?? "").toLowerCase()
+    );
+    if (!isAdmin && !isOwner && !isTechnicianAssigned) return json({ ok: false, error: "forbidden" }, 403, req);
     return json({ ok: true, request: mapReq(row) }, 200, req);
   }
 
@@ -381,11 +403,15 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
     if (!existing) return json({ ok: false, error: "request not found" }, 404, req);
     const isAdmin = user.role === "admin" || user.role === "superadmin";
     const isOwner = String(existing["owner_email"]).toLowerCase() === String(user.email).toLowerCase() || Number(existing["owner_id"]) === Number(user.id);
-    if (!isAdmin && !isOwner) return json({ ok: false, error: "forbidden" }, 403, req);
+    const isTechnicianAssigned = user.role === "technician" && (
+      String(existing["assigned_to"]).toLowerCase() === String(user.fullname).toLowerCase() ||
+      String(existing["assigned_to"]).toLowerCase() === String((user as unknown as { username?: string }).username ?? "").toLowerCase()
+    );
+    if (!isAdmin && !isOwner && !isTechnicianAssigned) return json({ ok: false, error: "forbidden" }, 403, req);
 
     const body = await req.json().catch(() => null) as {
       priority?: string; assignedTo?: string; status?: string; title?: string; description?: string; location?: string; category?: string; type?: string;
-      confirmed?: boolean;
+      confirmed?: boolean; evidence?: unknown[]; materials?: unknown[];
     } | null;
     if (!body) return json({ ok: false, error: "invalid json" }, 400, req);
 
@@ -393,7 +419,14 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
     const updates: Record<string, unknown> = {};
     if (body.priority && ["Low","Medium","High","Urgent"].includes(body.priority)) updates["priority"] = body.priority;
     if (body.status && ["pending","in-progress","completed","rejected"].includes(body.status)) {
-      if (!isAdmin && body.status !== "pending") return json({ ok: false, error: "only admin can change status" }, 403, req);
+      if (!isAdmin) {
+        // technician assigned can progress their own jobs: pending→in-progress→completed
+        if (isTechnicianAssigned && ["in-progress","completed"].includes(body.status)) {
+          // allowed
+        } else if (body.status !== "pending") {
+          return json({ ok: false, error: "only admin can change status" }, 403, req);
+        }
+      }
       updates["status"] = body.status;
     }
     if (body.assignedTo !== undefined) {
@@ -412,6 +445,42 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
         updates["confirmed_by"] = null;
         updates["confirmed_at"] = null;
       }
+    }
+    // Technician evidence & required materials — allowed for assigned technician and admin
+    const canEditTechFields = isAdmin || isTechnicianAssigned;
+    if (body.evidence !== undefined) {
+      if (!canEditTechFields) return json({ ok: false, error: "only assigned technician or admin can update evidence" }, 403, req);
+      if (!Array.isArray(body.evidence)) return json({ ok: false, error: "evidence must be array" }, 400, req);
+      // basic sanitization: limit 20 items, each max ~2MB base64
+      const sanitized = (body.evidence as unknown[]).slice(0, 20).map((e) => {
+        const o = e as Record<string, unknown>;
+        return {
+          id: String(o["id"] ?? `ev-${Date.now()}-${Math.random().toString(36).slice(2,6)}`),
+          name: String(o["name"] ?? "evidence").slice(0, 120),
+          dataUrl: o["dataUrl"] ? String(o["dataUrl"]).slice(0, 2_500_000) : null, // allow image preview
+          size: Number(o["size"] ?? 0),
+          uploadedAt: String(o["uploadedAt"] ?? new Date().toISOString()),
+          uploadedBy: String(o["uploadedBy"] ?? user.email).slice(0, 120),
+        };
+      });
+      updates["evidence_json"] = JSON.stringify(sanitized);
+    }
+    if (body.materials !== undefined) {
+      if (!canEditTechFields) return json({ ok: false, error: "only assigned technician or admin can update materials" }, 403, req);
+      if (!Array.isArray(body.materials)) return json({ ok: false, error: "materials must be array" }, 400, req);
+      const sanitizedM = (body.materials as unknown[]).slice(0, 50).map((m) => {
+        const o = m as Record<string, unknown>;
+        return {
+          id: String(o["id"] ?? `mt-${Date.now()}-${Math.random().toString(36).slice(2,6)}`),
+          name: String(o["name"] ?? "").slice(0, 120),
+          qty: Number(o["qty"] ?? 0),
+          unit: String(o["unit"] ?? "pcs").slice(0, 20),
+          note: String(o["note"] ?? "").slice(0, 300),
+          addedAt: String(o["addedAt"] ?? new Date().toISOString()),
+          addedBy: String(o["addedBy"] ?? user.email).slice(0, 120),
+        };
+      }).filter((x) => x.name);
+      updates["materials_json"] = JSON.stringify(sanitizedM);
     }
     // owner-editable before assignment (admin can also edit)
     if (isOwner || isAdmin) {
