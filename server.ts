@@ -431,7 +431,20 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
     }
     if (body.assignedTo !== undefined) {
       if (!isAdmin) return json({ ok: false, error: "only admin can assign technician" }, 403, req);
+      const newAssignee = String(body.assignedTo ?? "").trim();
       updates["assigned_to"] = body.assignedTo;
+      // Stamp Job Order when admin assigns a real technician (not Pending Assignment)
+      if (newAssignee && newAssignee.toLowerCase() !== "pending assignment") {
+        const existingJO = String(existing["job_order_no"] ?? "");
+        updates["job_order_no"] = existingJO || `JO-${publicId}`;
+        updates["job_order_issued_by"] = user.email;
+        updates["job_order_issued_at"] = new Date().toISOString();
+      } else {
+        // unassign: clear job order (keep history? clear for now)
+        // keep job_order fields as-is if already issued? optional clear:
+        // commented to preserve JO after unassign for audit
+        // updates["job_order_no"] = null; updates["job_order_issued_by"] = null; updates["job_order_issued_at"] = null;
+      }
     }
     // ADMIN confirmation of work — admin only, stamps confirmed_by/at
     if (body.confirmed !== undefined) {

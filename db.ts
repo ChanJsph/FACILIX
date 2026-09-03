@@ -143,6 +143,28 @@ try {
   console.warn("  ⚠️ requests evidence/materials migration failed", e);
 }
 
+// Migration: job order issued by admin (for technician)
+try {
+  const rcols3 = db.prepare("PRAGMA table_info(requests)").all() as { name: string }[];
+  const hasJOBy = rcols3.some((c) => c.name === "job_order_issued_by");
+  const hasJOAt = rcols3.some((c) => c.name === "job_order_issued_at");
+  const hasJONo = rcols3.some((c) => c.name === "job_order_no");
+  if (!hasJOBy) {
+    db.exec("ALTER TABLE requests ADD COLUMN job_order_issued_by TEXT;");
+    console.log("  🔧 migrated: added requests.job_order_issued_by");
+  }
+  if (!hasJOAt) {
+    db.exec("ALTER TABLE requests ADD COLUMN job_order_issued_at TEXT;");
+    console.log("  🔧 migrated: added requests.job_order_issued_at");
+  }
+  if (!hasJONo) {
+    db.exec("ALTER TABLE requests ADD COLUMN job_order_no TEXT;");
+    console.log("  🔧 migrated: added requests.job_order_no");
+  }
+} catch (e) {
+  console.warn("  ⚠️ requests job order migration failed", e);
+}
+
 // Seed helpers
 function userExists(email: string): boolean {
   const row = db.prepare("SELECT 1 FROM users WHERE email = ? COLLATE NOCASE").get(email.toLowerCase());
@@ -284,6 +306,9 @@ export type RequestRow = {
   confirmed_at: string | null;
   evidence_json: string; // JSON array of {id,name,dataUrl,size,uploadedAt,uploadedBy}
   materials_json: string; // JSON array of {id,name,qty,unit,note,addedAt,addedBy}
+  job_order_issued_by: string | null;
+  job_order_issued_at: string | null;
+  job_order_no: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -315,6 +340,9 @@ export function toFrontendRequest(r: RequestRow & { owner_role?: string; owner_f
     confirmedAt: r.confirmed_at ?? null,
     evidence: safeParseJsonArray((r as unknown as { evidence_json?: string }).evidence_json ?? null),
     materials: safeParseJsonArray((r as unknown as { materials_json?: string }).materials_json ?? null),
+    jobOrderNo: (r as unknown as { job_order_no?: string }).job_order_no ?? null,
+    jobOrderIssuedBy: (r as unknown as { job_order_issued_by?: string }).job_order_issued_by ?? null,
+    jobOrderIssuedAt: (r as unknown as { job_order_issued_at?: string }).job_order_issued_at ?? null,
   };
 }
 
