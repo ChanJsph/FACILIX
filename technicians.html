@@ -111,10 +111,23 @@
                         </div>
                         <div class="form-group">
                             <label for="techRole">Role</label>
-                            <select id="techRole">
+                            <select id="techRole" onchange="toggleDeptField()">
                                 <option value="technician" selected>technician</option>
                                 <option value="admin">admin</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="deptField">
+                            <label for="techDepartment">Department * <small style="font-weight:normal;color:#64748b">(for technician only)</small></label>
+                            <select id="techDepartment" required>
+                                <option value="" disabled selected>Select department</option>
+                                <option value="Fire Protection / DAS">Fire Protection / DAS</option>
+                                <option value="Physical Structures">Physical Structures</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Water / Sanitary / Fixtures">Water / Sanitary / Fixtures</option>
+                                <option value="Air Conditioning">Air Conditioning</option>
+                            </select>
+                            <div class="hint" style="margin-top:6px;">Technician will only see requests in this category.</div>
                         </div>
                         <button type="submit" class="btn-primary" id="techSubmitBtn">Add Technician</button>
                         <button type="button" class="btn-ghost" onclick="addToLocalList()" style="width:100%;margin-top:8px;">+ Add to Local List Only (name)</button>
@@ -316,6 +329,15 @@
             URL.revokeObjectURL(url);
         }
 
+        function toggleDeptField(){
+            const role=document.getElementById('techRole').value;
+            const deptField=document.getElementById('deptField');
+            const deptSel=document.getElementById('techDepartment');
+            if(role==='technician'){ deptField.style.display='block'; deptSel.required=true; }
+            else { deptField.style.display='none'; deptSel.required=false; deptSel.value=''; }
+        }
+        window.toggleDeptField = toggleDeptField;
+
         async function loadTechnicians() {
             const listEl = document.getElementById('techList');
             const counter = document.getElementById('techCounter');
@@ -333,8 +355,10 @@
             const localTechs = getLocalList().map(x => ({ fullname: x.name, username: '-', email: '-', role: 'technician', source: 'local', id: x.id }));
 
             const all = [...localTechs, ...serverTechs];
-
-            counter.textContent = `${all.length} technician(s) — ${serverTechs.length} from server (SQLite) + ${localTechs.length} local`;
+            const deptCounts={};
+            serverTechs.forEach(u=>{ const d=u.department||'No dept'; deptCounts[d]=(deptCounts[d]||0)+1; });
+            const deptSummary = Object.entries(deptCounts).map(([k,v])=>`${k}:${v}`).join(' • ') || 'no server depts';
+            counter.textContent = `${all.length} technician(s) — ${serverTechs.length} from server (SQLite) + ${localTechs.length} local • ${deptSummary}`;
 
             if (all.length === 0) {
                 listEl.innerHTML = `<div class="empty">No technicians yet. Add via form on the left.</div>`;
@@ -345,14 +369,17 @@
                 const isLocal = u.source === 'local';
                 const name = u.fullname || u.name || '-';
                 const sub = isLocal ? `Local list • ${u.createdAt || ''}` : `${u.username || '-'} • ${u.email}`;
+                const deptBadge = !isLocal && u.role==='technician' ? `<span class="role" style="background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd;">${u.department||'No dept'}</span>` : '';
+                const roleBadge = `<span class="role">${u.role}</span>`;
                 return `
                     <div class="tech-item">
                         <div class="meta">
                             <span class="name">${name}</span>
                             <span class="sub">${sub}</span>
                         </div>
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <span class="role">${u.role}</span>
+                        <div style="display:flex;gap:8px;align-items:center; flex-wrap:wrap;">
+                            ${deptBadge}
+                            ${roleBadge}
                             ${isLocal ? `<button class="btn-ghost" onclick="removeLocal('${u.id}')" style="padding:6px 8px;font-size:12px;">Remove</button>` : ''}
                         </div>
                     </div>
@@ -381,6 +408,7 @@
             }
             loadTechnicians();
             loadInventory();
+            toggleDeptField();
         });
 
         // Create technician via SQLite (only superadmin can create technician/admin per auth.ts)
@@ -392,8 +420,10 @@
             const phone = document.getElementById('techPhone').value.trim();
             const password = document.getElementById('techPassword').value;
             const role = document.getElementById('techRole').value;
+            const department = document.getElementById('techDepartment')?.value?.trim() || null;
 
             if (!fullname || !email || !password) { alert('❌ Name, email, password required'); return; }
+            if (role==='technician' && !department) { alert('❌ Select department for technician'); return; }
 
             const btn = document.getElementById('techSubmitBtn');
             const orig = btn.textContent; btn.textContent = 'Creating...'; btn.disabled = true;
@@ -405,6 +435,7 @@
                 const payload = { fullname, email, password, role };
                 if (username) payload.username = username;
                 if (phone) payload.phone = phone;
+                if (role==='technician' && department) payload.department = department;
 
                 const res = await fetch('/api/auth/register', { method: 'POST', headers, body: JSON.stringify(payload) });
                 const data = await res.json();
@@ -417,8 +448,9 @@
                 const list = getLocalList();
                 list.unshift({ id: data.user.id, name: data.user.fullname, username: data.user.username, email: data.user.email, role: data.user.role, createdAt: new Date().toLocaleString(), source: 'server' });
                 // keep local list in sync but server is source of truth
-                alert(`✅ ${role} created: ${data.user.fullname} (${data.user.email})`);
+                alert(`✅ ${role} created: ${data.user.fullname} (${data.user.email})${data.user.department?` [${data.user.department}]`:''}`);
                 e.target.reset();
+                toggleDeptField();
                 loadTechnicians();
             } catch (err) {
                 console.error(err);

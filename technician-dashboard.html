@@ -136,19 +136,27 @@
         <div class="tech-header">
             <div>
                 <h1>🔧 Technician Dashboard</h1>
-                <p>Jobs assigned to you — update status when you start and complete work</p>
+                <p id="techHeaderSub">Jobs assigned to you — department-specific view</p>
             </div>
-            <span class="tech-badge" id="techBadge">Loading...</span>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+                <span class="tech-badge" id="techBadge">Loading...</span>
+                <span class="tech-badge" id="deptBadge" style="background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd;display:none;">Dept: —</span>
+            </div>
         </div>
 
         <div class="sample-box" id="sampleBox">
             <div>
-                <div style="font-size:13px; font-weight:800; color:#0f2a47;">Sample Technician Account</div>
-                <div style="font-size:12px; color:#64748b; margin-top:4px;">Use this to login as technician — or create more via superadmin at <code>technicians.html</code></div>
+                <div style="font-size:13px; font-weight:800; color:#0f2a47;">Sample Technician Accounts — department-specific</div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">Each technician only sees their department (category). Create more via superadmin at <code>technicians.html</code></div>
+                <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                    <code style="font-size:11px;">electrical.tech@facilix.com / Tech123! [Electrical]</code>
+                    <code style="font-size:11px;">mechanical.tech@facilix.com / Tech123! [Mechanical]</code>
+                    <code style="font-size:11px;">hvac.tech@facilix.com / Tech123! [Air Conditioning]</code>
+                </div>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                 <code>technician@facilix.com</code>
-                <code>Tech123!</code>
+                <code>Tech123! [Electrical]</code>
                 <button onclick="copySample()" style="padding:6px 10px; border:1px solid #fcd34d; background:#fff; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;">Copy</button>
                 <a href="login.html" style="padding:6px 10px; background:#0f2a47; color:white; border-radius:6px; text-decoration:none; font-weight:700; font-size:12px;">Go to Login</a>
             </div>
@@ -170,6 +178,7 @@
             <button class="filter-btn" data-status="in-progress" onclick="filterJobs('in-progress')">In Progress <span class="pill-count" id="pill-in-progress">0</span></button>
             <button class="filter-btn" data-status="completed" onclick="filterJobs('completed')">Completed <span class="pill-count" id="pill-completed">0</span></button>
         </div>
+        <div id="deptFilterNote" style="display:none;margin:-10px 0 16px;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;color:#1e40af;font-size:12px;font-weight:600;"></div>
 
         <div class="requests-grid" id="jobsGrid"></div>
         <div id="emptyState" class="empty-state" style="display:none;">
@@ -591,6 +600,19 @@
             const user=await checkTechLogin();
             if(!user) return;
             document.getElementById('techBadge').textContent=`${user.fullname||user.username} — ${user.role}`;
+            const dept = user.department || null;
+            const deptBadge=document.getElementById('deptBadge');
+            const deptNote=document.getElementById('deptFilterNote');
+            const sub=document.getElementById('techHeaderSub');
+            if(dept && deptBadge){
+                deptBadge.textContent=`Dept: ${dept}`;
+                deptBadge.style.display='inline-block';
+            }
+            if(deptNote){
+                if(dept){ deptNote.textContent=`🔧 Department-specific — showing only “${dept}” requests (your department). Pending unassigned ${dept} jobs also appear as available.`; deptNote.style.display='block'; }
+                else { deptNote.textContent=`⚠ No department set — you see all assigned jobs. Ask admin to set your department in technicians.html`; deptNote.style.display='block'; deptNote.style.background='#fffbeb'; deptNote.style.borderColor='#fde68a'; deptNote.style.color='#92400e'; }
+            }
+            if(sub && dept) sub.textContent=`Jobs for ${dept} — assigned to you + available ${dept} pending jobs`;
             await loadJobs();
             setInterval(loadJobs, 3000);
         });

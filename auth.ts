@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { db, findUserByEmail, findUserByUsername, findUserByIdentifier, findUserById, type UserRow } from "./db.ts";
+import { db, findUserByEmail, findUserByUsername, findUserByIdentifier, findUserById, type UserRow, DEPARTMENTS } from "./db.ts";
 
 export const ROLES = ["superadmin", "admin", "technician", "complainant"] as const;
 export type Role = typeof ROLES[number];
@@ -42,7 +42,7 @@ export function toSafeUser(u: UserRow): SafeUser {
 }
 
 export async function registerUser(
-  data: { fullname: string; username?: string; email: string; phone?: string; password: string; role?: Role },
+  data: { fullname: string; username?: string; email: string; phone?: string; password: string; role?: Role; department?: string | null },
   actor?: SafeUser | null,
 ): Promise<{ ok: true; user: SafeUser } | { ok: false; error: string; status?: number }> {
   const fullname = data.fullname?.trim();
@@ -51,12 +51,20 @@ export async function registerUser(
   const phone = data.phone?.trim() ?? null;
   const password = data.password ?? "";
   let role: Role = (data.role as Role) ?? "complainant";
+  const department = data.department?.trim() || null;
 
   if (!fullname || !email || !password) return { ok: false, error: "fullname, email, password required", status: 400 };
   if (!email.includes("@")) return { ok: false, error: "invalid email", status: 400 };
   if (username && !/^[a-zA-Z0-9._-]{3,20}$/.test(username)) return { ok: false, error: "username must be 3-20 chars (a-z,0-9,._-)", status: 400 };
   if (password.length < 6) return { ok: false, error: "password must be >=6 chars", status: 400 };
   if (!ROLES.includes(role)) return { ok: false, error: `invalid role, must be ${ROLES.join("|")}`, status: 400 };
+  // Department validation — only meaningful for technician, but allow null for others
+  if (department && !(DEPARTMENTS as readonly string[]).includes(department)) {
+    return { ok: false, error: `invalid department, must be ${DEPARTMENTS.join(" | ")}`, status: 400 };
+  }
+  if (role === "technician" && !department) {
+    return { ok: false, error: `technician requires department (${DEPARTMENTS.join(" | ")})`, status: 400 };
+  }
 
   // Role assignment check — only superadmin can create technician/admin/superadmin
   const actorRole = (actor?.role as Role) ?? null;
@@ -69,9 +77,9 @@ export async function registerUser(
 
   const hash = await hashPassword(password);
   const stmt = db.prepare(
-    "INSERT INTO users (fullname, username, email, phone, password_hash, role) VALUES (?, ?, ?, ?, ?, ?)",
+    "INSERT INTO users (fullname, username, email, phone, password_hash, role, department) VALUES (?, ?, ?, ?, ?, ?, ?)",
   );
-  stmt.run(fullname, username, email, phone, hash, role);
+  stmt.run(fullname, username, email, phone, hash, role, department);
   const newId = db.lastInsertRowId;
   const user = findUserById(newId)!;
   return { ok: true, user: toSafeUser(user) };

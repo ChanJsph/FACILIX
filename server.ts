@@ -110,7 +110,7 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
   // ---- Auth: Register ----
   if ((url.pathname === "/api/auth/register" || url.pathname === "/api/register") && req.method === "POST") {
     const body = await req.json().catch(() => null) as {
-      fullname?: string; username?: string; email?: string; phone?: string; password?: string; role?: string;
+      fullname?: string; username?: string; email?: string; phone?: string; password?: string; role?: string; department?: string;
     } | null;
     if (!body) return json({ ok: false, error: "invalid json" }, 400, req);
 
@@ -125,6 +125,7 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
       phone: body.phone,
       password: body.password ?? "",
       role: (body.role as Role) ?? "complainant",
+      department: body.department ?? null,
     }, actor);
 
     if (!res.ok) return json({ ok: false, error: res.error }, res.status ?? 400, req);
@@ -305,7 +306,9 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
       }
       if (filterStatus) rows = rows.filter((r) => String(r["status"]) === filterStatus);
     } else if (role === "technician") {
-      // technician: own requests + assigned jobs (assigned_to matches fullname or username)
+      // technician: department-specific — assigned jobs + department pool
+      const deptRaw = (user as unknown as { department?: string | null }).department ?? null;
+      const dept = deptRaw ? String(deptRaw).trim() : null;
       rows = db.prepare(`
         SELECT r.*, u.role as owner_role, u.fullname as owner_fullname FROM requests r
         LEFT JOIN users u ON u.id = r.owner_id
@@ -321,6 +324,27 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
         seen.add(pid);
         return true;
       });
+      // department filter: only jobs in technician's department (strict), plus department pool (unassigned pending in dept)
+      if (dept) {
+        rows = rows.filter((r) => String(r["category"]) === dept);
+        // add department pool: pending unassigned jobs in same category (available to this dept)
+        try {
+          const pool = db.prepare(`
+            SELECT r.*, u.role as owner_role, u.fullname as owner_fullname FROM requests r
+            LEFT JOIN users u ON u.id = r.owner_id
+            WHERE r.category = ? COLLATE NOCASE
+              AND r.assigned_to = 'Pending Assignment' COLLATE NOCASE
+              AND r.status = 'pending'
+            ORDER BY r.id DESC
+          `).all(dept) as Record<string, unknown>[];
+          const seenP = new Set(rows.map((r) => String(r["public_id"])));
+          for (const p of pool) {
+            const pid = String(p["public_id"]);
+            if (!seenP.has(pid)) { rows.push(p); seenP.add(pid); }
+          }
+          rows.sort((a, b) => Number(b["id"] ?? 0) - Number(a["id"] ?? 0));
+        } catch {}
+      }
       if (filterStatus) rows = rows.filter((r) => String(r["status"]) === filterStatus);
     } else {
       // complainant: only own requests
@@ -348,7 +372,9 @@ async function handleApi(req: Request, url: URL): Promise<Response | null> {
       String(row["assigned_to"]).toLowerCase() === String(user.fullname).toLowerCase() ||
       String(row["assigned_to"]).toLowerCase() === String((user as unknown as { username?: string }).username ?? "").toLowerCase()
     );
-    if (!isAdmin && !isOwner && !isTechnicianAssigned) return json({ ok: false, error: "forbidden" }, 403, req);
+    const techDept = (user as unknown as { department?: string | null }).department ?? null;
+    const isDeptPool = user.role === "technician" && techDept && String(row["category"]) === String(techDept) && String(row["assigned_to"]) === "Pending Assignment" && String(row["status"]) === "pending";
+    if (!isAdmin && !isOwner && !isTechnicianAssigned && !isDeptPool) return json({ ok: false, error: "forbidden" }, 403, req);
     return json({ ok: true, request: mapReq(row) }, 200, req);
   }
 

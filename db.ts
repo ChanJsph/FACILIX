@@ -47,6 +47,19 @@ try {
   console.warn("  ⚠️ migration check failed", e);
 }
 
+// Migration: department for technician (category-aligned)
+export const DEPARTMENTS = ["Fire Protection / DAS","Physical Structures","Electrical","Mechanical","Water / Sanitary / Fixtures","Air Conditioning"] as const;
+try {
+  const cols = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
+  const hasDept = cols.some((c) => c.name === "department");
+  if (!hasDept) {
+    db.exec("ALTER TABLE users ADD COLUMN department TEXT;");
+    console.log("  🔧 migrated: added users.department");
+  }
+} catch (e) {
+  console.warn("  ⚠️ department migration failed", e);
+}
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS sessions (
     id TEXT PRIMARY KEY,
@@ -183,22 +196,35 @@ async function seedUser(
   password: string,
   role: "superadmin" | "admin" | "technician" | "complainant",
   username?: string,
+  department?: string | null,
 ) {
   if (userExists(email)) return;
   if (username && userExistsUsername(username)) return;
   const hash = await bcrypt.hash(password, 10);
   db.prepare(
-    "INSERT INTO users (fullname, username, email, phone, password_hash, role) VALUES (?, ?, ?, ?, ?, ?)",
-  ).run(fullname, username ?? null, email.toLowerCase(), phone, hash, role);
-  console.log(`  🌱 seeded ${role}: ${email} / ${password}${username ? ` (username:${username})` : ""}`);
+    "INSERT INTO users (fullname, username, email, phone, password_hash, role, department) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  ).run(fullname, username ?? null, email.toLowerCase(), phone, hash, role, department ?? null);
+  console.log(`  🌱 seeded ${role}: ${email} / ${password}${username ? ` (username:${username})` : ""}${department ? ` [${department}]` : ""}`);
 }
 
 // Seed default accounts (only if missing) — establish superadmin first
 await seedUser("Overlord", "lanachristianjosephd@gmail.com", "+1-000-000-0001", "admin123", "superadmin", "overlord");
 await seedUser("Super Admin", "superadmin@facilix.com", "+1-000-000-0000", "SuperAdmin123!", "superadmin", "superadmin");
 await seedUser("Admin", "admin@facilix.com", "+1-111-111-1111", "Admin123!", "admin", "admin");
-await seedUser("Alex Technician", "technician@facilix.com", "+1-222-222-2222", "Tech123!", "technician", "technician");
+await seedUser("Alex Technician", "technician@facilix.com", "+1-222-222-2222", "Tech123!", "technician", "technician", "Electrical");
 await seedUser("John Complainant", "complainant@facilix.com", "+1-333-333-3333", "User123!", "complainant", "complainant");
+// Department-specific technicians (one per category for demo)
+await seedUser("Maya Electrical", "electrical.tech@facilix.com", "+1-222-222-2223", "Tech123!", "technician", "electrical_tech", "Electrical");
+await seedUser("Sam Mechanical", "mechanical.tech@facilix.com", "+1-222-222-2224", "Tech123!", "technician", "mechanical_tech", "Mechanical");
+await seedUser("Ivy HVAC", "hvac.tech@facilix.com", "+1-222-222-2225", "Tech123!", "technician", "hvac_tech", "Air Conditioning");
+await seedUser("Paul Plumbing", "plumbing.tech@facilix.com", "+1-222-222-2226", "Tech123!", "technician", "plumbing_tech", "Water / Sanitary / Fixtures");
+await seedUser("Frank Fire", "fire.tech@facilix.com", "+1-222-222-2227", "Tech123!", "technician", "fire_tech", "Fire Protection / DAS");
+await seedUser("Steve Structural", "structural.tech@facilix.com", "+1-222-222-2228", "Tech123!", "technician", "structural_tech", "Physical Structures");
+
+// Backfill: existing technicians with null department → default Electrical (for old DBs)
+try {
+  db.prepare("UPDATE users SET department = 'Electrical' WHERE role='technician' AND (department IS NULL OR department='')").run();
+} catch {}
 
 // Seed mock requests if empty (so admin has data to fetch)
 try {
@@ -229,6 +255,8 @@ const counts = db.prepare("SELECT role, COUNT(*) as c FROM users GROUP BY role")
 console.log("  📦 users:", counts.map((r) => `${r.role}:${r.c}`).join(" "));
 try { const rc2 = db.prepare("SELECT COUNT(*) as c FROM requests").get() as { c: number }; console.log("  📦 requests:", rc2.c); } catch {}
 
+export type Department = typeof DEPARTMENTS[number];
+
 export type UserRow = {
   id: number;
   fullname: string;
@@ -237,6 +265,7 @@ export type UserRow = {
   phone: string | null;
   password_hash: string;
   role: "superadmin" | "admin" | "technician" | "complainant";
+  department: string | null;
   is_active: number;
   created_at: string;
   updated_at: string;
@@ -268,7 +297,7 @@ export function findUserById(id: number): UserRow | undefined {
 }
 
 export function listUsersSafe() {
-  return db.prepare("SELECT id, fullname, username, email, phone, role, is_active, created_at, updated_at FROM users ORDER BY id").all();
+  return db.prepare("SELECT id, fullname, username, email, phone, role, department, is_active, created_at, updated_at FROM users ORDER BY id").all();
 }
 
 export function updateUserRole(id: number, role: string) {
