@@ -216,7 +216,7 @@ body {
 .user-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(255,255,255,0.20);
     padding: 4px 10px 4px 4px;
@@ -226,11 +226,12 @@ body {
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
-    max-width: 168px;
+    max-width: 220px;
     white-space: nowrap;
     transition: all 0.2s ease;
     user-select: none;
 }
+.user-role-flag { flex-shrink: 0; }
 .user-pill:hover {
     background: rgba(255,255,255,0.18);
     border-color: rgba(255,255,255,0.28);

@@ -119,11 +119,24 @@
         const initial = (name.trim()[0] || "U").toUpperCase();
         const loginTime = (() => { try { return u?.loginTime || ""; } catch { return ""; } })() || new Date().toLocaleString();
         const shortName = name.split(" ")[0] || name;
+        const roleFlag = (() => {
+          const r = (role || "").toLowerCase();
+          const label = r || "unknown";
+          const styles = {
+            superadmin: "background:#0f2a47;color:#ffc107;border-color:#ffc107;",
+            admin: "background:#dbeafe;color:#1e40af;border-color:#bfdbfe;",
+            technician: "background:#dcfce7;color:#166534;border-color:#86efac;",
+            complainant: "background:#f1f5f9;color:#475569;border-color:#e2e8f0;",
+          };
+          const s = styles[r] || "background:#f8fafc;color:#64748b;border-color:#e2e8f0;";
+          return `<span class="user-role-flag" data-role="${r}" style="font-size:9px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;padding:2px 6px;border-radius:999px;border:1px solid;white-space:nowrap;line-height:1;${s}">${label}</span>`;
+        })();
         // Compact pill in nav bar — details only in dropdown
         authButtons.innerHTML = `
-          <button class="user-pill" id="navUserPill" aria-expanded="false" aria-haspopup="true" aria-controls="userDropdown" title="${name} — ${email}">
+          <button class="user-pill" id="navUserPill" aria-expanded="false" aria-haspopup="true" aria-controls="userDropdown" title="${name} — ${email} — ${role}">
             <span class="user-avatar">${initial}</span>
             <span class="user-name">${shortName}</span>
+            ${roleFlag}
             <svg class="user-pill-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
